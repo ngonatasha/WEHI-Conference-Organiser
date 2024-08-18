@@ -10,7 +10,7 @@ body, html, #root {
 
 /* Main  */
 .container {
-  max-width: 800px;
+  max-width: 1200px; 
   width: 100%;
   padding: 20px;
   box-sizing: border-box;
@@ -20,6 +20,14 @@ body, html, #root {
 h1 {
   color: #571845;
   font-size: 2.5em;
+  margin-bottom: 20px;
+}
+
+h2 {
+  text-align: left; 
+  color: #000000;
+  font-size: 1.5em;
+  margin-top: 30px;
   margin-bottom: 20px;
 }
 
@@ -55,9 +63,10 @@ th {
 }
 
 /* Responsive Adjustments */
-@media (max-width: 600px) {
+@media (max-width: 900px) {
   .container {
-    padding: 10px;
+    max-width: 100%; 
+    padding: 15px;
   }
 
   h1 {
