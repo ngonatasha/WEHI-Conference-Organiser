@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import banner from './assets/conference_banner_small_website.png';
+import './App.css';
 
 const timeZoneAbbreviations = {
   'UTC': 'UTC',
@@ -21,13 +23,16 @@ const timeZoneAbbreviations = {
 };
 
 function App() {
-  const [selectedTimeZone, setSelectedTimeZone] = useState('UTC');
   const [currentTime, setCurrentTime] = useState('');
+  const [userTimeZone, setUserTimeZone] = useState('');
 
   useEffect(() => {
+    const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    setUserTimeZone(userTimeZone);
+
     const updateTimeDisplay = () => {
       const options = {
-        timeZone: selectedTimeZone,
+        timeZone: userTimeZone,
         weekday: 'long',
         year: 'numeric',
         month: 'long',
@@ -38,7 +43,8 @@ function App() {
         hour12: false,
       };
       const current = new Intl.DateTimeFormat('en-US', options).format(new Date());
-      setCurrentTime(`${current} ${timeZoneAbbreviations[selectedTimeZone]}`);
+      const timeZoneAbbr = timeZoneAbbreviations[userTimeZone] || userTimeZone;
+      setCurrentTime(`${current} ${timeZoneAbbr}`);
     };
 
     const updateEventDates = () => {
@@ -48,7 +54,7 @@ function App() {
         const eventDate = new Date(utcDate);
 
         const options = {
-          timeZone: selectedTimeZone,
+          timeZone: userTimeZone,
           year: 'numeric',
           month: 'long',
           day: 'numeric',
@@ -59,7 +65,7 @@ function App() {
         };
 
         const formattedDate = new Intl.DateTimeFormat('en-US', options).format(eventDate);
-        const timeZoneAbbr = timeZoneAbbreviations[selectedTimeZone];
+        const timeZoneAbbr = timeZoneAbbreviations[userTimeZone] || userTimeZone;
         dateElement.textContent = `${formattedDate} ${timeZoneAbbr}`;
       });
     };
@@ -71,14 +77,14 @@ function App() {
         const eventTime = new Date(utcTime);
 
         const options = {
-          timeZone: selectedTimeZone,
+          timeZone: userTimeZone,
           hour: '2-digit',
           minute: '2-digit',
           hour12: false
         };
 
         const formattedTime = new Intl.DateTimeFormat('en-US', options).format(eventTime);
-        const timeZoneAbbr = timeZoneAbbreviations[selectedTimeZone];
+        const timeZoneAbbr = timeZoneAbbreviations[userTimeZone] || userTimeZone;
         timeElement.textContent = `${formattedTime} ${timeZoneAbbr}`;
       });
     };
@@ -89,35 +95,20 @@ function App() {
 
     const intervalId = setInterval(updateTimeDisplay, 1000);
     return () => clearInterval(intervalId);
-  }, [selectedTimeZone]);
-
-  const handleTimeZoneChange = (event) => {
-    setSelectedTimeZone(event.target.value);
-  };
+  }, []);
 
   return (
     <div style={{ padding: '30px', fontFamily: 'Roboto, sans-serif' }}>
       <h1 style={{ color: '#571845' }}>
         RSEAA24 - A research software community event for Asia and Australia
       </h1>
-      <label htmlFor="timezone-select">Select Time Zone:</label>
-      <select
-        id="timezone-select"
-        value={selectedTimeZone}
-        onChange={handleTimeZoneChange}
-        style={{ width: '300px', marginBottom: '20px' }}
-      >
-        {Object.keys(timeZoneAbbreviations).map((zone) => (
-          <option key={zone} value={zone}>
-            {zone} ({timeZoneAbbreviations[zone]})
-          </option>
-        ))}
-      </select>
+      <img src={banner} alt="Conference Banner" className="conference-banner" />
 
-      <div id="time" style={{ fontSize: '24px', margin: '10px 0' }}>
+      <div id="time" style={{ fontSize: '24px', margin: '20px 0' }}>
         Current Time: {currentTime}
       </div>
 
+      {/* Key dates */}
       <h2>Key Dates</h2>
       <table id="key-dates" style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
         <thead>
@@ -239,7 +230,11 @@ function App() {
           </tr>
         </tbody>
       </table>
+
+      /* TODO Add the map stuff here!! */
+       <h2 className="sub-title">Where is everyone attending from?</h2>
     </div>
+    
   );
 }
 
