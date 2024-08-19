@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import banner from './assets/conference_banner_small_website.png';
 import './App.css';
+
 import EventTables from './EventTables'; // Import the table component!
+import WorldMap from "react-svg-worldmap"; // npm install react-world-map
 
 const timeZoneAbbreviations = {
   'UTC': 'UTC',
@@ -26,6 +28,19 @@ const timeZoneAbbreviations = {
   'America/Sao_Paulo': 'BRT',
   'Africa/Johannesburg': 'SAST'
 };
+
+const mapData = [
+  { country: "cn", value: 14 }, // China
+  { country: "in", value: 13 }, // India
+  { country: "us", value: 12 }, // United States
+  { country: "id", value: 10 }, // Indonesia
+  { country: "pk", value: 9 },  // Pakistan
+  { country: "br", value: 8 },  // Brazil
+  { country: "ng", value: 7 },  // Nigeria
+  { country: "bd", value: 6 },  // Bangladesh
+  { country: "ru", value: 5 },  // Russia
+  { country: "mx", value: 4 },  // Mexico
+];
 
 function App() {
   const [currentTime, setCurrentTime] = useState('');
@@ -70,6 +85,16 @@ function App() {
       <EventTables /> {}
       {/* TODO Add the map stuff here */}
       <h2 className="sub-title">Where is everyone attending from?</h2>
+      <div className="Map">
+      <WorldMap
+        color="red" // Adjust to a more intense base color if needed
+        title="Country Intensity Map"
+        valueSuffix=" intensity level"
+        size="lg"
+        data={mapData}
+      />
+    </div>
+
     </div>
   );
 }
