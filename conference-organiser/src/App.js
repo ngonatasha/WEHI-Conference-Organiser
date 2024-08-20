@@ -2,32 +2,10 @@ import React, { useState, useEffect } from 'react';
 import banner from './assets/conference_banner_small_website.png';
 import './App.css';
 
-import EventTables from './EventTables'; // Import the table component!
-import WorldMap from "react-svg-worldmap"; // npm install react-world-map
+import EventTables from './EventTables';
+import WorldMap from "react-svg-worldmap";
+import timeZoneAbbreviations from './timeZoneAbbreviations';
 
-const timeZoneAbbreviations = {
-  'UTC': 'UTC',
-  'America/New_York': 'EDT',
-  'America/Chicago': 'CDT',
-  'America/Denver': 'MDT',
-  'America/Los_Angeles': 'PDT',
-  'Europe/London': 'BST',
-  'Europe/Paris': 'CEST',
-  'Europe/Berlin': 'CEST',
-  'Europe/Moscow': 'MSK',
-  'Asia/Dubai': 'GST',
-  'Asia/Tokyo': 'JST',
-  'Asia/Shanghai': 'CST',
-  'Asia/Singapore': 'SGT',
-  'Australia/Sydney': 'AEDT',
-  'Australia/Brisbane': 'AEST',
-  'Australia/Adelaide': 'ACDT',
-  'Australia/Darwin': 'ACST',
-  'Australia/Perth': 'AWST',
-  'Asia/Kolkata': 'IST',
-  'America/Sao_Paulo': 'BRT',
-  'Africa/Johannesburg': 'SAST'
-};
 
 const mapData = [
   { country: "cn", value: 14 }, // China
@@ -40,7 +18,7 @@ const mapData = [
   { country: "bd", value: 6 },  // Bangladesh
   { country: "ru", value: 5 },  // Russia
   { country: "mx", value: 4 },  // Mexico
-];
+];         
 
 function App() {
   const [currentTime, setCurrentTime] = useState('');
@@ -82,19 +60,17 @@ function App() {
         Current Time: {currentTime}
       </div>
 
-      <EventTables /> {}
-      {/* TODO Add the map stuff here */}
+      <EventTables userTimeZone={userTimeZone} />
+      
       <h2 className="sub-title">Where is everyone attending from?</h2>
       <div className="Map">
       <WorldMap
-        color="red" // Adjust to a more intense base color if needed
-        title="Country Intensity Map"
+        color="red"
         valueSuffix=" intensity level"
         size="lg"
         data={mapData}
       />
     </div>
-
     </div>
   );
 }
