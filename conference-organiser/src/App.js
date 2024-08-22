@@ -1,78 +1,63 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import banner from './assets/conference_banner_small_website.png';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'; 
 import './App.css';
-
-import EventTables from './EventTables';
+import EventTables from './homepage/EventTables';
 import WorldMap from "react-svg-worldmap";
-import timeZoneAbbreviations from './timeZoneAbbreviations';
-
-
-const mapData = [
-  { country: "cn", value: 14 }, // China
-  { country: "in", value: 13 }, // India
-  { country: "us", value: 12 }, // United States
-  { country: "id", value: 10 }, // Indonesia
-  { country: "pk", value: 9 },  // Pakistan
-  { country: "br", value: 8 },  // Brazil
-  { country: "ng", value: 7 },  // Nigeria
-  { country: "bd", value: 6 },  // Bangladesh
-  { country: "ru", value: 5 },  // Russia
-  { country: "mx", value: 4 },  // Mexico
-];         
+import mapData from './homepage/mapData';
+import { useTime } from './homepage/time';
+import Poll from './Poll';
+import { useButtonHandlers } from './buttonHandling';  
 
 function App() {
-  const [currentTime, setCurrentTime] = useState('');
-  const [userTimeZone, setUserTimeZone] = useState('');
+  const { currentTime, userTimeZone } = useTime(); // Timezone handling
+  const { handleHomeButton, handlePollAdminAccess } = useButtonHandlers();  // Button handling
 
-  useEffect(() => {
-    const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    setUserTimeZone(userTimeZone);
 
-    const updateTimeDisplay = () => {
-      const options = {
-        timeZone: userTimeZone,
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false,
-      };
-      const current = new Intl.DateTimeFormat('en-US', options).format(new Date());
-      const timeZoneAbbr = timeZoneAbbreviations[userTimeZone] || userTimeZone;
-      setCurrentTime(`${current} ${timeZoneAbbr}`);
-    };
-
-    updateTimeDisplay();
-
-    const intervalId = setInterval(updateTimeDisplay, 1000);
-    return () => clearInterval(intervalId);
-  }, [userTimeZone]);
-
+  // HTML Code for the homepage
   return (
     <div className="container">
       <h1>RSEAA24 - A research software community event for Asia and Australia</h1>
-      <img src={banner} alt="Conference Banner" className="conference-banner" />
 
+      <div className="buttonContainer">
+        <button onClick={handleHomeButton} className="buttons">
+          Homepage
+        </button>
+        <button onClick={handlePollAdminAccess} className="buttons">
+          Poll
+        </button>
+      </div>
+
+      <img src={banner} alt="Conference Banner" className="conference-banner" />
       <div id="time" className="time-display">
         Current Time: {currentTime}
       </div>
 
       <EventTables userTimeZone={userTimeZone} />
-      
+
       <h2 className="sub-title">Where is everyone attending from?</h2>
       <div className="Map">
-      <WorldMap
-        color="red"
-        valueSuffix=" intensity level"
-        size="lg"
-        data={mapData}
-      />
-    </div>
+        <WorldMap
+          color="purple"
+          valueSuffix=" intensity level"
+          size="xl"
+          data={mapData}
+        />
+      </div>
     </div>
   );
 }
 
-export default App;
+// Manages routing of pages
+function AppWrapper() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<App />} />
+        <Route path="/poll" element={<Poll />} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default AppWrapper;

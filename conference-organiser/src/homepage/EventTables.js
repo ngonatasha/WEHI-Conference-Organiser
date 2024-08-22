@@ -1,6 +1,6 @@
 import React from 'react';
-import './App.css';
-import timeZoneAbbreviations from './timeZoneAbbreviations';
+import '../App.css';
+import { timeZoneAbbreviations } from './time';
 
 const EventTables = ({ userTimeZone }) => {
   const isValidTimeZone = (tz) => {
@@ -35,7 +35,7 @@ const EventTables = ({ userTimeZone }) => {
     const timeZoneAbbr = timeZoneAbbreviations[timeZone] || timeZone;
     return `${formattedDate} ${timeZoneAbbr}`;
   };
-  
+
   return (
     <div>
       {/* Key dates table */}
