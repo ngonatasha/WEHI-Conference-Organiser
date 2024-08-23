@@ -1,13 +1,14 @@
 import React from 'react';
 import banner from './assets/conference_banner_small_website.png';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'; 
+import { useNavigate, BrowserRouter as Router, Route, Routes } from 'react-router-dom'; 
 import './App.css';
 import EventTables from './homepage/EventTables';
 import WorldMap from "react-svg-worldmap";
 import mapData from './homepage/mapData';
 import { useTime } from './homepage/time';
+import { useButtonHandlers } from './buttonHandling';
 import Poll from './Poll';
-import { useButtonHandlers } from './buttonHandling';  
+import CreatePollQuestion from './CreatePollQuestion';
 
 function App() {
   const { currentTime, userTimeZone } = useTime(); // Timezone handling
@@ -55,6 +56,7 @@ function AppWrapper() {
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/poll" element={<Poll />} />
+        <Route path="/create-poll" element={<CreatePollQuestion />} />
       </Routes>
     </Router>
   );
