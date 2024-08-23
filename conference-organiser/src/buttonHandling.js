@@ -12,8 +12,13 @@ export function useButtonHandlers() {
     navigate('/poll');
   };
 
+  const handleCreatePollClick = () => {
+    navigate('/create-poll');
+  };
+
   return {
     handleHomeButton,
     handlePollAdminAccess,
+    handleCreatePollClick
   };
 }
