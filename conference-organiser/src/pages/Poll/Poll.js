@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../../utils/axios';
 import { useButtonHandlers } from '../../utils/buttonHandling';  // Import the button handlers
 import CreatePollQuestion from '../../pages/CreatePollQuestion/CreatePollQuestion';
 
@@ -8,7 +9,19 @@ function Poll() {
     const [isAuthenticated, setIsAuthenticated] = useState(false); // Check user is authenticated 
     const [pollQuestions, setPollQuestions] = useState([]); // State to hold poll questions
     const { handleHomeButton } = useButtonHandlers();  // Use the home button handler
+    useEffect(() => {
+        // Fetch poll questions from the backend when the component mounts
+        const fetchPollQuestions = async () => {
+            try {
+                const response = await axiosInstance.get('/question');
+                setPollQuestions(response.data);
+            } catch (error) {
+                console.error('Error fetching poll questions:', error);
+            }
+        };
 
+        fetchPollQuestions();
+    }, []); // Empty dependency array means this effect runs once on mount
     // Handling the password
     const passwordCheck = () => {
         if (password === '123456789') {

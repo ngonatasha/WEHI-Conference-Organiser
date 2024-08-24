@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import './CreatePollQuestion.css';
-
+import axiosInstance from '../../utils/axios';
 function CreatePollQuestion({ onCreate }) {
   const navigate = useNavigate(); // Initialize useNavigate
-  const [questionType, setQuestionType] = useState('open'); // Default to open question
+  const [questionType, setQuestionType] = useState('Open question'); // Default to open question
   const [questionDescription, setQuestionDescription] = useState('');
   const [questionImage, setQuestionImage] = useState(null);
   const [choices, setChoices] = useState([{ text: '', isCorrect: false }]);
@@ -15,25 +15,32 @@ function CreatePollQuestion({ onCreate }) {
   };
 
   // Function to handle form submission
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (questionDescription && questionType) {
-      // Create the poll question object
-      const pollQuestion = {
-        questionType,
-        questionDescription,
-        questionImage,
-        choices: questionType === 'multiple' ? choices : undefined,
-      };
+      const formData = new FormData();
+      formData.append('type', questionType);
+      formData.append('description', questionDescription);
+      if (questionImage) {
+        formData.append('image', questionImage);
+      }
+      if (questionType === 'multiple') {
+        formData.append('choices', JSON.stringify(choices));
+      }
 
-      // Pass the poll question data to the parent component
-      if (onCreate) onCreate(pollQuestion);
+      try {
+        await axiosInstance.post('/question', formData);
 
-      alert('Poll question created!');
-      navigate('/poll'); // Navigate back to Poll page
+        alert('Poll question created!');
+        navigate('/poll');
+      } catch (error) {
+        console.error('Error creating poll question:', error);
+        alert('Failed to create poll question');
+      }
     } else {
       alert('Please fill in all required fields.');
     }
   };
+
 
   // Function to handle adding/removing choices for multiple-choice questions
   const handleChoiceChange = (index, event) => {
@@ -68,8 +75,8 @@ function CreatePollQuestion({ onCreate }) {
         <label>
           Question Type:
           <select value={questionType} onChange={(e) => setQuestionType(e.target.value)}>
-            <option value="open">Open Question</option>
-            <option value="multiple">Multiple Choice</option>
+            <option value="Open Question">Open Question</option>
+            <option value="Multiple Choice">Multiple Choice</option>
           </select>
         </label>
         <label>
