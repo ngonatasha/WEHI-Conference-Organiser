@@ -2,13 +2,13 @@ import React from 'react';
 import banner from './assets/conference_banner_small_website.png';
 import { useNavigate, BrowserRouter as Router, Route, Routes } from 'react-router-dom'; 
 import './App.css';
-import EventTables from './homepage/EventTables';
+import EventTables from './pages/homepage/EventTables';
 import WorldMap from "react-svg-worldmap";
-import mapData from './homepage/mapData';
-import { useTime } from './homepage/time';
-import { useButtonHandlers } from './buttonHandling';
-import Poll from './Poll';
-import CreatePollQuestion from './CreatePollQuestion';
+import mapData from './utils/mapData';
+import { useTime } from './utils/time';
+import { useButtonHandlers } from './utils/buttonHandling';
+import Poll from './pages/Poll/Poll';
+import CreatePollQuestion from './pages/CreatePollQuestion/CreatePollQuestion';
 
 function App() {
   const { currentTime, userTimeZone } = useTime(); // Timezone handling

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useButtonHandlers } from './buttonHandling';  // Import the button handlers
-import CreatePollQuestion from './CreatePollQuestion';
+import { useButtonHandlers } from '../../utils/buttonHandling';  // Import the button handlers
+import CreatePollQuestion from '../../pages/CreatePollQuestion/CreatePollQuestion';
 
 function Poll() {
     const [password, setPassword] = useState(''); // State for the password input
