@@ -25,7 +25,7 @@ async function findQuestionById(id) {
 }
 const findAllQuestions = async () => {
     try {
-      const questions = await Question.findAll();
+      const questions = await questionModel.findAll();
       return questions;
     } catch (error) {
       throw new Error('Error fetching questions: ' + error.message);

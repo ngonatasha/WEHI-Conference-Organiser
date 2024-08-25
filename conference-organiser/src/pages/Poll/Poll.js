@@ -10,18 +10,32 @@ function Poll() {
     const [pollQuestions, setPollQuestions] = useState([]); // State to hold poll questions
     const { handleHomeButton } = useButtonHandlers();  // Use the home button handler
     useEffect(() => {
-        // Fetch poll questions from the backend when the component mounts
         const fetchPollQuestions = async () => {
             try {
                 const response = await axiosInstance.get('/question');
-                setPollQuestions(response.data);
+                const formattedQuestions = response.data.map((question) => ({
+                    questionType: question.type, 
+                    questionDescription: question.description,
+                    questionImage: question.image ? convertBufferToBase64(question.image.data) : null,
+                 
+                }));
+                console.log(formattedQuestions);
+                setPollQuestions(formattedQuestions);
             } catch (error) {
                 console.error('Error fetching poll questions:', error);
             }
         };
 
         fetchPollQuestions();
-    }, []); // Empty dependency array means this effect runs once on mount
+    }, []); 
+
+    const convertBufferToBase64 = (buffer) => {
+        return btoa(
+            new Uint8Array(buffer)
+            .reduce((data, byte) => data + String.fromCharCode(byte), '')
+        );
+    };
+
     // Handling the password
     const passwordCheck = () => {
         if (password === '123456789') {
@@ -78,7 +92,10 @@ function Poll() {
                                 <h3>Question {index + 1}</h3>
                                 <p>Type: {question.questionType}</p>
                                 <p>Description: {question.questionDescription}</p>
-                                {question.questionImage && <img src={URL.createObjectURL(question.questionImage)} alt="Question" />}
+                                {question.questionImage &&
+                                 <img src={`data:image/png;base64,${question.questionImage}`} alt="Question"
+                                 style={{ maxWidth: '200px', maxHeight: '200px'}}
+                                  />}
                                 
                                 {question.questionType === 'multiple' && (
                                   <ul>
