@@ -77,23 +77,6 @@ th {
 }
 
 
-.buttons {
-  color: #571845;
-  padding: 10px 20px;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  margin-bottom: 10px;
-}
-
-.buttonContainer {
-  text-align: left; 
-  display: flex;
-  gap: 5px
-}
-
-
-
 /* Responsive Adjustments */
 @media (max-width: 900px) {
   .container {
@@ -113,4 +96,21 @@ th {
   td {
     padding: 6px;
   }
+}
+
+/* Going to put this in its own css file later */
+
+.buttons {
+  color: #571845;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.buttonContainer {
+  text-align: left; 
+  display: flex;
+  gap: 5px
 }

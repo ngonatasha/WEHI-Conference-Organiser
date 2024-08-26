@@ -9,16 +9,32 @@ export function useButtonHandlers() {
   };
 
   const handlePollAdminAccess = () => {
-    navigate('/poll');
+    navigate('/AdminPollPage');
   };
+
+    const handleResultsAcess = () => {
+    navigate('/ResultsPage');
+  };
+
+    const handleAdminAcess = () => {
+    navigate('/AdminPage');
+  };
+
 
   const handleCreatePollClick = () => {
     navigate('/create-poll');
   };
 
+  const handlePollAccess = () => {
+    navigate('/PollPage');
+  };
+
   return {
     handleHomeButton,
     handlePollAdminAccess,
-    handleCreatePollClick
+    handlePollAccess,
+    handleCreatePollClick,
+    handleAdminAcess,
+    handleResultsAcess
   };
 }

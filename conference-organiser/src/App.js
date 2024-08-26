@@ -1,18 +1,24 @@
 import React from 'react';
 import banner from './assets/conference_banner_small_website.png';
-import { useNavigate, BrowserRouter as Router, Route, Routes } from 'react-router-dom'; 
+import { useNavigate, BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
-import EventTables from './pages/homepage/EventTables';
+import EventTables from './pages/homepage/eventTables';
 import WorldMap from "react-svg-worldmap";
-import mapData from './utils/mapData';
-import { useTime } from './utils/time';
+import mapData from './pages/homepage/mapData';
+import { useTime } from './pages/homepage/time';
 import { useButtonHandlers } from './utils/buttonHandling';
-import Poll from './pages/Poll/Poll';
-import CreatePollQuestion from './pages/CreatePollQuestion/CreatePollQuestion';
+import CreatePollQuestion from './pages/adminPollPage/createPollQuestion';
+
+// Pages
+import AdminPollPage from './pages/adminPollPage/adminPollPage'; // Not sure why its red
+import AdminPage from './pages/AdminPage';
+import PollPage from './pages/poll/poll';
+import ResultsPage from './pages/results/Results';
+
 
 function App() {
   const { currentTime, userTimeZone } = useTime(); // Timezone handling
-  const { handleHomeButton, handlePollAdminAccess } = useButtonHandlers();  // Button handling
+  const { handleHomeButton, handlePollAdminAccess, handlePollAccess, handleAdminAcess } = useButtonHandlers();  // Button handling
 
 
   // HTML Code for the homepage
@@ -24,7 +30,10 @@ function App() {
         <button onClick={handleHomeButton} className="buttons">
           Homepage
         </button>
-        <button onClick={handlePollAdminAccess} className="buttons">
+        <button onClick={handleAdminAcess} className="buttons">
+          Admin
+        </button>
+        <button onClick={handlePollAccess} className="buttons">
           Poll
         </button>
       </div>
@@ -55,8 +64,11 @@ function AppWrapper() {
     <Router>
       <Routes>
         <Route path="/" element={<App />} />
-        <Route path="/poll" element={<Poll />} />
+        <Route path="/adminPollPage" element={<AdminPollPage />} />
+        <Route path="/pollPage" element={<PollPage />} />
         <Route path="/create-poll" element={<CreatePollQuestion />} />
+        <Route path="/adminPage" element={<AdminPage />} />
+        <Route path="/resultsPage" element={<ResultsPage />} />
       </Routes>
     </Router>
   );

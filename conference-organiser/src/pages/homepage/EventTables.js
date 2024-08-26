@@ -1,6 +1,6 @@
 import React from 'react';
 import '../../App.css';
-import { timeZoneAbbreviations } from '../../utils/time';
+import { timeZoneAbbreviations } from './time';
 
 const EventTables = ({ userTimeZone }) => {
   const isValidTimeZone = (tz) => {
