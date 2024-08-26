@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './CreatePollQuestion.css';
+import './createPollQuestion.css';
 
 function CreatePollQuestion({ onCreate }) {
   const navigate = useNavigate();
@@ -9,9 +9,9 @@ function CreatePollQuestion({ onCreate }) {
   const [questionImage, setQuestionImage] = useState(null);
   const [choices, setChoices] = useState([{ text: '', isCorrect: false }]);
 
-  const handleGoBack = () => {
-    navigate('/poll');
-  };
+  // const handleGoBack = () => {
+  //   navigate('/poll');
+  // };
 
   const handleSubmit = () => {
     if (questionDescription && questionType) {
@@ -24,8 +24,8 @@ function CreatePollQuestion({ onCreate }) {
 
       if (onCreate) onCreate(pollQuestion);
 
-      alert('Poll question created!');
-      navigate('/poll');
+      // alert('Poll question created!');
+      navigate('/AdminPollPage');
     } else {
       alert('Please fill in all required fields.');
     }
@@ -56,9 +56,9 @@ function CreatePollQuestion({ onCreate }) {
   return (
     <div className="create-poll-container">
       <h2>Create Poll Question</h2>
-      <button onClick={handleGoBack} className="buttons">
+      {/* <button onClick={handleGoBack} className="buttons">
         Go Back
-      </button>
+      </button> */}
       <div>
         <label>
           Question Type:
@@ -112,11 +112,6 @@ function CreatePollQuestion({ onCreate }) {
         
         <button onClick={handleSubmit} className="buttons">
           Add Question
-        </button>
-      </div>
-      <div className="submit-poll-container">
-        <button className="buttons">
-          Submit Poll
         </button>
       </div>
     </div>

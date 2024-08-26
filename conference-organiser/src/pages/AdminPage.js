@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useButtonHandlers } from '../../utils/buttonHandling';  // Import the button handlers
+import { useButtonHandlers } from '../utils/buttonHandling';  // Import the button handlers
 
-function PollPage() {
+// Page
+
+
+function AdminPage() {
     const [password, setPassword] = useState(''); // State for the password input
     const [isAuthenticated, setIsAuthenticated] = useState(false); // Check if user is authenticated 
-    const { handleHomeButton } = useButtonHandlers();  // Use the home button handler
+    const { handleHomeButton, handlePollAdminAccess, handleResultsAcess} = useButtonHandlers();  // Use the home button handler
 
     // Handling the password
     const passwordCheck = () => {
-        if (password === 'CODE') {
+        if (password === 'WEHI') {
             setIsAuthenticated(true);
         } else {
             alert('Invalid code.');
@@ -21,7 +24,7 @@ function PollPage() {
         <div>
             {!isAuthenticated ? (
                 <div>
-                    <h1>Enter your unique poll code</h1>
+                    <h1>Requires admin access</h1>
                     <button onClick={handleHomeButton} className="buttons">
                         Homepage
                     </button>
@@ -37,9 +40,17 @@ function PollPage() {
                 </div>
             ) : (
                 <div>
-                    <h1>Welcome to the xyz poll!</h1>
+                    {/* Poll section */}
+
+                    <h1>Welcome to the admin page!</h1>
                     <button onClick={handleHomeButton} className="buttons">
                         Homepage
+                    </button>
+                    <button onClick={handlePollAdminAccess} className="buttons">
+                        Create poll
+                    </button>
+                    <button onClick={handleResultsAcess} className="buttons">
+                        See poll results
                     </button>
 
                 </div>
@@ -48,4 +59,4 @@ function PollPage() {
     );
 }
 
-export default PollPage;
+export default AdminPage;

@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useButtonHandlers } from '../../utils/buttonHandling';  // Import the button handlers
 
-function PollPage() {
+function ResultsPage() {
     const [password, setPassword] = useState(''); // State for the password input
     const [isAuthenticated, setIsAuthenticated] = useState(false); // Check if user is authenticated 
-    const { handleHomeButton } = useButtonHandlers();  // Use the home button handler
+    const { handleHomeButton, handlePollAdminAccess } = useButtonHandlers();  // Use the home button handler
 
     // Handling the password
     const passwordCheck = () => {
@@ -21,7 +21,7 @@ function PollPage() {
         <div>
             {!isAuthenticated ? (
                 <div>
-                    <h1>Enter your unique poll code</h1>
+                    <h1>Enter unique poll code to access results</h1>
                     <button onClick={handleHomeButton} className="buttons">
                         Homepage
                     </button>
@@ -37,7 +37,9 @@ function PollPage() {
                 </div>
             ) : (
                 <div>
-                    <h1>Welcome to the xyz poll!</h1>
+                    {/* Poll section */}
+
+                    <h1>Here you can see the results for xyz poll</h1>
                     <button onClick={handleHomeButton} className="buttons">
                         Homepage
                     </button>
@@ -48,4 +50,4 @@ function PollPage() {
     );
 }
 
-export default PollPage;
+export default ResultsPage;
