@@ -32,7 +32,33 @@ const findAllPolls = async () => {
     throw new Error('Error fetching polls: ' + error.message);
   }
 };
+// Find a poll by uniqueCode
+const findPollByUniqueCode = async (uniqueCode) => {
+  try {
+    const poll = await pollModel.findOne({
+      where: { uniqueCode }
+    });
+    return poll;
+  } catch (error) {
+    throw new Error('Error finding poll by uniqueCode: ' + error.message);
+  }
+};
+// Find all questions for a poll by uniqueCode
+const findQuestionsByPollUniqueCode = async (uniqueCode) => {
+  try {
+    const poll = await findPollByUniqueCode(uniqueCode);
+    if (!poll) {
+      throw new Error('Poll not found');
+    }
 
+    const questions = await questionModel.findAll({
+      where: { pollId: poll.id }
+    });
+    return questions;
+  } catch (error) {
+    throw new Error('Error finding questions by poll uniqueCode: ' + error.message);
+  }
+};
 // Update a poll by ID
 const updatePoll = async (id, updates) => {
   try {
@@ -68,5 +94,7 @@ module.exports = {
   findPollById,
   updatePoll,
   deletePoll,
-  findAllPolls
+  findAllPolls,
+  findPollByUniqueCode,
+  findQuestionsByPollUniqueCode,
 };

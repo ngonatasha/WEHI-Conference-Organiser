@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const questionService = require('../service/questionService');
+const pollService = require('../service/pollService');
 
 // Create a new question
 router.post('/', async (req, res) => {
@@ -22,7 +23,20 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-// Get a question by ID
+router.get('/uni/:uniqueCode', async (req, res) => {
+  try {
+    const { uniqueCode } = req.params;
+    const questions = await pollService.findQuestionsByPollUniqueCode(uniqueCode);
+    if (questions.length > 0) {
+      res.status(200).json(questions);
+    } else {
+      res.status(404).json({ error: 'No questions found for this poll' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+//Get a question by ID
 router.get('/:id', async (req, res) => {
   try {
     const id = req.params.id;

@@ -10,31 +10,7 @@ function AdminPollPage() {
     const generateUniqueCode = () => {
         return Math.floor(1000 + Math.random() * 9000); 
     };
-    // useEffect(() => {
-    //     const fetchPollQuestions = async () => {
-    //         try {
-    //             const response = await axiosInstance.get('/question');
-    //             const formattedQuestions = response.data.map((question) => ({
-    //                 questionType: question.questionType,
-    //                 questionDescription: question.questionDescription,
-    //                 questionImage: question.questionImage ? convertBufferToBase64(question.questionImage.data) : null,
-    //             }));
-    //             console.log(formattedQuestions);
-    //             setPollQuestions(formattedQuestions);
-    //         } catch (error) {
-    //             console.error('Error fetching poll questions:', error);
-    //         }
-    //     };
 
-    //     fetchPollQuestions();
-    // }, []);
-
-    const convertBufferToBase64 = (buffer) => {
-        return btoa(
-            new Uint8Array(buffer)
-                .reduce((data, byte) => data + String.fromCharCode(byte), '')
-        );
-    };
     const SubmitPoll = async () => {
         try {
             const uniqueCode = generateUniqueCode();

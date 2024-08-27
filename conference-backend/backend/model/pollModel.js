@@ -8,7 +8,7 @@ const pollModel = sequelize.define('pollModel', {
     allowNull: false
   },
   uniqueCode: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: false
   },
   
