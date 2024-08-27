@@ -13,18 +13,20 @@ function CreatePollQuestion({ onCreate }) {
   //   navigate('/poll');
   // };
 
-  const handleSubmit = () => {
+   const handleSubmit = () => {
     if (questionDescription && questionType) {
-      const pollQuestion = {
-        questionType,
-        questionDescription,
-        questionImage,
-        choices: questionType === 'multiple' ? choices : undefined,
-      };
+      const formData = new FormData();
+      formData.append('questionType', questionType);
+      formData.append('questionDescription', questionDescription);
+      if (questionImage) {
+        formData.append('questionImage', questionImage);
+      }
+      if (questionType === 'multiple') {
+        formData.append('choices', JSON.stringify(choices));
+      }
 
-      if (onCreate) onCreate(pollQuestion);
+      if (onCreate) onCreate(formData);
 
-      // alert('Poll question created!');
       navigate('/AdminPollPage');
     } else {
       alert('Please fill in all required fields.');

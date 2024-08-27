@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/question', upload.single('image'),questionRouter);
+app.use('/question', upload.single('questionImage'),questionRouter);
 app.use('/poll', pollRouter);
 
 // catch 404 and forward to error handler

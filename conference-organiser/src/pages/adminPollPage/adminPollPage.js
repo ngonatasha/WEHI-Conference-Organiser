@@ -42,17 +42,18 @@ function AdminPollPage() {
             
             const pollId = pollResponse.data.id; 
 
-            const formattedQuestions = pollQuestions.map(question => ({
-                questionType: question.questionType,
-                questionDescription: question.questionDescription,
-                questionImage: question.questionImage,
-                choices: question.choices,
-                pollId: pollId
-            }));
-            console.log("formattedQuestions",formattedQuestions)
+            const formDataArray = pollQuestions.map(questionFormData => {
+                questionFormData.append('pollId', pollId);
+                return questionFormData;
+            });
+
             const responses = await Promise.all(
-                formattedQuestions.map(question =>
-                    axiosInstance.post('/question', question)
+                formDataArray.map(formData =>
+                    axiosInstance.post('/question', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    })
                 )
             );
             console.log('All questions submitted successfully:', responses.map(res => res.data));
@@ -87,18 +88,18 @@ function AdminPollPage() {
                 {pollQuestions.map((question, index) => (
                     <div key={index}>
                         <h3>Question {index + 1}</h3>
-                        <p>Type: {question.questionType}</p>
-                        <p>Description: {question.questionDescription}</p>
-                        {question.questionImage && (
+                        <p>Type: {question.get("questionType")}</p>
+                        <p>Description: {question.get("questionDescription")}</p>
+                        {question.get('questionImage') && (
                             <img
-                                src={`data:image/png;base64,${question.questionImage}`}
+                                src={URL.createObjectURL(question.get('questionImage'))}
                                 alt="Question"
                                 style={{ maxWidth: '200px', maxHeight: '200px' }}
                             />
                         )}
-                        {question.questionType === 'multiple' && (
+                        {question.get("questionType") === 'multiple' && (
                             <ul>
-                                {question.choices.map((choice, i) => (
+                                {JSON.parse(question.get("choices")).map((choice, i) => (
                                     <li key={i}>
                                         {choice.text} {choice.isCorrect ? '(Correct)' : ''}
                                     </li>
