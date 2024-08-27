@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../backend/db');
+const pollModel = require('./pollModel'); 
 const questionModel = sequelize.define('questionModel', {
   id: {
     type: DataTypes.INTEGER,
@@ -7,22 +8,38 @@ const questionModel = sequelize.define('questionModel', {
     primaryKey: true,
     allowNull: false
   },
-  type: {
-    type: DataTypes.ENUM('Open question', 'Multiple Choice'),
-    allowNull: true
+  questionType: {
+    type: DataTypes.STRING,
+    allowNull: false
   },
-  description: {
+  questionDescription: {
     type: DataTypes.STRING,
     allowNull: true
   },
-  image: {
+  questionImage: {
     type: DataTypes.BLOB('long'), 
     allowNull: true
+  },
+  choices: {
+    type: DataTypes.JSON,
+    allowNull: true
+  },
+  pollId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: pollModel, 
+      key: 'id'
+    },
+    onDelete: 'CASCADE',
+    allowNull: false
   }
 }, {
+  schema: 'Conference_react',
   tableName: 'questionModel', 
   timestamps: false 
 });
+questionModel.belongsTo(pollModel, { foreignKey: 'pollId' });
+pollModel.hasMany(questionModel, { foreignKey: 'pollId', onDelete: 'CASCADE' })
 sequelize.sync({ force: false })
   .then(() => {
     console.log('Database & tables created!');

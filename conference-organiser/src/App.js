@@ -2,7 +2,7 @@ import React from 'react';
 import banner from './assets/conference_banner_small_website.png';
 import { useNavigate, BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
-import EventTables from './pages/homepage/eventTables';
+import EventTables from './pages/homepage/EventTables';
 import WorldMap from "react-svg-worldmap";
 import mapData from './pages/homepage/mapData';
 import { useTime } from './pages/homepage/time';
@@ -12,7 +12,7 @@ import CreatePollQuestion from './pages/adminPollPage/createPollQuestion';
 // Pages
 import AdminPollPage from './pages/adminPollPage/adminPollPage'; // Not sure why its red
 import AdminPage from './pages/AdminPage';
-import PollPage from './pages/poll/poll';
+import PollPage from './pages/Poll/Poll';
 import ResultsPage from './pages/results/Results';
 
 

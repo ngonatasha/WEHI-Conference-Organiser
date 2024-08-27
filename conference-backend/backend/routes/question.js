@@ -5,21 +5,23 @@ const questionService = require('../service/questionService');
 // Create a new question
 router.post('/', async (req, res) => {
   try {
-    const { type, description } = req.body;
-    const image = req.file ? req.file.buffer : null; 
+    const { questionType, questionDescription, choices,pollId } = req.body;
+    const questionImage = req.file ? req.file.buffer : null; 
 
     const data = {
-      type,
-      description,
-      image
+      questionType,
+      questionDescription,
+      questionImage,
+      choices,
+      pollId
     };
+    
     const newQuestion = await questionService.createQuestion(data);
-    res.status(200).json(newQuestion);
+    res.status(201).json(newQuestion);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
-
 // Get a question by ID
 router.get('/:id', async (req, res) => {
   try {

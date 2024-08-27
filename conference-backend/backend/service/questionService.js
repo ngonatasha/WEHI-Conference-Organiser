@@ -2,17 +2,21 @@ const questionModel = require('../model/questionModel');
 
 // Create a new record
 const createQuestion = async (data) => {
-    try {
+  try {
       const newQuestion = await questionModel.create({
-        type: data.type,
-        description: data.description,
-        image: data.image
+          questionType: data.questionType, 
+          questionDescription: data.questionDescription, 
+          questionImage: data.questionImage, 
+          choices: data.choices,
+          pollId: data.pollId 
       });
       return newQuestion;
-    } catch (error) {
+  } catch (error) {
+    console.log(data)
       throw new Error(`Error creating question: ${error.message}`);
-    }
-  };
+  }
+};
+
 
 // Find a question by ID
 async function findQuestionById(id) {

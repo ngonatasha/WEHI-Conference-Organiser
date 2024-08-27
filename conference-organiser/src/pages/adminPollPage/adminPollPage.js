@@ -7,25 +7,27 @@ import CreatePollQuestion from './createPollQuestion';
 function AdminPollPage() {
     const [pollQuestions, setPollQuestions] = useState([]); // State to hold poll questions
     const { handleHomeButton } = useButtonHandlers();  // Use the home button handler
+    const generateUniqueCode = () => {
+        return Math.floor(1000 + Math.random() * 9000); 
+    };
+    // useEffect(() => {
+    //     const fetchPollQuestions = async () => {
+    //         try {
+    //             const response = await axiosInstance.get('/question');
+    //             const formattedQuestions = response.data.map((question) => ({
+    //                 questionType: question.questionType,
+    //                 questionDescription: question.questionDescription,
+    //                 questionImage: question.questionImage ? convertBufferToBase64(question.questionImage.data) : null,
+    //             }));
+    //             console.log(formattedQuestions);
+    //             setPollQuestions(formattedQuestions);
+    //         } catch (error) {
+    //             console.error('Error fetching poll questions:', error);
+    //         }
+    //     };
 
-    useEffect(() => {
-        const fetchPollQuestions = async () => {
-            try {
-                const response = await axiosInstance.get('/question');
-                const formattedQuestions = response.data.map((question) => ({
-                    questionType: question.type,
-                    questionDescription: question.description,
-                    questionImage: question.image ? convertBufferToBase64(question.image.data) : null,
-                }));
-                console.log(formattedQuestions);
-                setPollQuestions(formattedQuestions);
-            } catch (error) {
-                console.error('Error fetching poll questions:', error);
-            }
-        };
-
-        fetchPollQuestions();
-    }, []);
+    //     fetchPollQuestions();
+    // }, []);
 
     const convertBufferToBase64 = (buffer) => {
         return btoa(
@@ -33,12 +35,39 @@ function AdminPollPage() {
                 .reduce((data, byte) => data + String.fromCharCode(byte), '')
         );
     };
+    const SubmitPoll = async () => {
+        try {
+            const uniqueCode = generateUniqueCode();
+            const pollResponse = await axiosInstance.post('/poll', { uniqueCode });
+            
+            const pollId = pollResponse.data.id; 
 
+            const formattedQuestions = pollQuestions.map(question => ({
+                questionType: question.questionType,
+                questionDescription: question.questionDescription,
+                questionImage: question.questionImage,
+                choices: question.choices,
+                pollId: pollId
+            }));
+            console.log("formattedQuestions",formattedQuestions)
+            const responses = await Promise.all(
+                formattedQuestions.map(question =>
+                    axiosInstance.post('/question', question)
+                )
+            );
+            console.log('All questions submitted successfully:', responses.map(res => res.data));
+
+            setPollQuestions([]);
+            alert('Poll and questions submitted successfully!');
+        } catch (error) {
+            console.error('Error submitting poll:', error);
+            alert('There was an error submitting the poll. Please try again.');
+        }
+    };
     // Function to handle adding a new poll question
     const handleCreatePoll = (newPollQuestion) => {
         setPollQuestions([...pollQuestions, newPollQuestion]);
     };
-
     // HTML Code for Poll Admin page
     return (
         <div>
@@ -80,7 +109,7 @@ function AdminPollPage() {
                 ))}
             </div>
             <div className="submit-poll-container">
-                <button className="buttons">
+                <button onClick={SubmitPoll} className="buttons">
                     Submit Poll
                 </button>
             </div>
