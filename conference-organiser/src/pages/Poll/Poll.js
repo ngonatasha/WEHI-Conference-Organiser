@@ -1,51 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useButtonHandlers } from '../../utils/buttonHandling';  // Import the button handlers
+import { useButtonHandlers } from '../../utils/buttonHandling';  
+import io from 'socket.io-client'; 
 import axiosInstance from '../../utils/axios';
-import io from 'socket.io-client'; // Import socket.io-client
-
 const PollPage = () => {
-    const [password, setPassword] = useState(''); // State for the password input
-    const [isAuthenticated, setIsAuthenticated] = useState(false); // Check if user is authenticated 
+    const [password, setPassword] = useState(''); 
+    const [isAuthenticated, setIsAuthenticated] = useState(false); 
     const [questions, setQuestions] = useState([]);
+    const [results, setResults] = useState([]);
     const [socket, setSocket] = useState(null);
-    const { handleHomeButton } = useButtonHandlers();  // Use the home button handler
+    const { handleHomeButton } = useButtonHandlers();  
     const navigate = useNavigate();
 
     useEffect(() => {
         // Set up WebSocket connection
-        const socketIo = io('http://localhost:2000'); // Adjust the URL as needed
+        const socketIo = io('http://localhost:2000'); // Ensure this port matches with app.js
         setSocket(socketIo);
 
         // Handle WebSocket events
         socketIo.on('resultCreated', (results) => {
-            setQuestions((prevQuestions) =>
-                prevQuestions.map((q) =>
-                    q.id === results[0].questionId
-                        ? { ...q, results }
-                        : q
-                )
-            );
+            console.log('resultCreated received:', results); // Debug log
+            setResults(results)
         });
 
         socketIo.on('resultUpdated', (results) => {
-            setQuestions((prevQuestions) =>
-                prevQuestions.map((q) =>
-                    q.id === results[0].questionId
-                        ? { ...q, results }
-                        : q
-                )
-            );
+            console.log('resultUpdated received:', results); // Debug log
+            setResults(results)
         });
 
         socketIo.on('resultDeleted', (results) => {
-            setQuestions((prevQuestions) =>
-                prevQuestions.map((q) =>
-                    q.id === results[0].questionId
-                        ? { ...q, results }
-                        : q
-                )
-            );
+            console.log('resultDeleted received:', results); // Debug log
+            setResults(results)
         });
 
         return () => {
@@ -53,7 +38,6 @@ const PollPage = () => {
         };
     }, []);
 
-    // Handling the password
     const passwordCheck = async () => {
         try {
             const response = await axiosInstance.get(`/question/uni/${password}`);
@@ -70,16 +54,12 @@ const PollPage = () => {
         }
     };
 
-    // Handle answer submission
-    const submitAnswer = async (questionId, answer) => {
-        try {
-            await axiosInstance.post('/result', { answer, questionId });
-        } catch (error) {
-            console.error('Error submitting answer:', error);
+    const submitAnswer = (questionId, answer) => {
+        if (socket) {
+            socket.emit('createResult', { answer, questionId });
         }
     };
 
-    // Convert buffer to Base64
     const convertBufferToBase64 = (buffer) => {
         return btoa(
             new Uint8Array(buffer)
@@ -129,14 +109,14 @@ const PollPage = () => {
                                         <input
                                             type="text"
                                             placeholder="Enter your answer"
-                                            onChange={(e) => (question.currentAnswer = e.target.value)} // Store answer in state
+                                            onChange={(e) => (question.currentAnswer = e.target.value)} 
                                         />
                                         <button onClick={() => submitAnswer(question.id, question.currentAnswer)}>
                                             Submit
                                         </button>
                                     </div>
                                     <div>
-                                        {question.results && question.results.map((result) => (
+                                        {results && results.map((result) => (
                                             <div key={result.answer}>
                                                 <p>Answer: {result.answer}</p>
                                                 <p>Ratio: {result.ratio}</p>
@@ -156,4 +136,6 @@ const PollPage = () => {
 };
 
 export default PollPage;
+
+
 
