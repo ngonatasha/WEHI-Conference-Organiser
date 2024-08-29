@@ -67,7 +67,6 @@ const deleteResult = async (id) => {
   const result = await findResultById(id);
   if (result) {
     await result.destroy();
-    io.emit('resultDeleted', await getResultsByQuestionId(result.questionId)); // Notify clients about the updated results after deletion
     return result;
   }
   return null;

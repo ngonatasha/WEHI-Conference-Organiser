@@ -9,12 +9,11 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 const { Server } = require('socket.io');
 const http = require('http');
-const resultService = require('./service/resultService'); // 引入服务层
+const resultService = require('./service/resultService'); 
 
 const app = express();
 const server = http.createServer(app);
 
-// 配置 WebSocket 服务器
 const io = new Server(server, {
   cors: {
     origin: 'http://localhost:3000',
@@ -23,7 +22,6 @@ const io = new Server(server, {
   }
 });
 
-// WebSocket 处理逻辑
 io.on('connection', (socket) => {
   console.log('a user connected');
 
@@ -65,9 +63,9 @@ io.on('connection', (socket) => {
       const { id, updates } = data;
       const updatedResult = await resultService.updateResult(id, updates);
       if (updatedResult) {
-        const questionId = updatedResult.questionId; // Assuming the result has a questionId field
+        const questionId = updatedResult.questionId; 
         io.emit('resultUpdated', await resultService.getResultsByQuestionId(questionId));
-        socket.emit('resultUpdated', updatedResult); // Optionally notify the sender
+        socket.emit('resultUpdated', updatedResult); 
       } else {
         socket.emit('error', { message: 'Result not found' });
       }
@@ -81,7 +79,7 @@ io.on('connection', (socket) => {
       const deletedResult = await resultService.deleteResult(id);
       if (deletedResult) {
         io.emit('resultDeleted', await resultService.getResultsByQuestionId(deletedResult.questionId));
-        socket.emit('resultDeleted', deletedResult); // Optionally notify the sender
+      
       } else {
         socket.emit('error', { message: 'Result not found' });
       }

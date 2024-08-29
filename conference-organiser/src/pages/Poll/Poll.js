@@ -13,23 +13,18 @@ const PollPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Set up WebSocket connection
-        const socketIo = io('http://localhost:2000'); // Ensure this port matches with app.js
+        const socketIo = io('http://localhost:2000'); 
         setSocket(socketIo);
 
-        // Handle WebSocket events
         socketIo.on('resultCreated', (results) => {
-            console.log('resultCreated received:', results); // Debug log
             setResults(results)
         });
 
         socketIo.on('resultUpdated', (results) => {
-            console.log('resultUpdated received:', results); // Debug log
             setResults(results)
         });
 
         socketIo.on('resultDeleted', (results) => {
-            console.log('resultDeleted received:', results); // Debug log
             setResults(results)
         });
 
