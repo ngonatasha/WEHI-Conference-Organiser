@@ -114,6 +114,7 @@ const PollPage = () => {
                                         {results && results.map((result) => (
                                             <div key={result.answer}>
                                                 <p>Answer: {result.answer}</p>
+                                                <p>Total: {result.total}</p>
                                                 <p>Ratio: {result.ratio}</p>
                                             </div>
                                         ))}

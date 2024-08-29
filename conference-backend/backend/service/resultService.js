@@ -48,7 +48,7 @@ const updateRatio = async (questionId) => {
 const getResultsByQuestionId = async (questionId) => {
   return await resultModel.findAll({ 
     where: { questionId }, 
-    attributes: ['answer', 'ratio'] // Only include answer and ratio
+    attributes: ['answer', 'total','ratio'] // Only include answer and ratio
   });
 };
 
