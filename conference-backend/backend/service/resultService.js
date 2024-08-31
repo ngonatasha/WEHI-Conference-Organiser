@@ -1,46 +1,52 @@
 const resultModel = require('../model/resultModel');
-const questionModel = require('../model/questionModel'); // 需要导入 questionModel 来获取总的结果数量
-const { io } = require('../app'); // 导入 WebSocket 实例
-
+const questionModel = require('../model/questionModel');
+const sequelize = require('../../backend/db');
 // Create or update a result based on the answer
 const createOrUpdateResult = async (data) => {
   const { answer, questionId } = data;
   const normalizedAnswer = answer.toLowerCase();
-  const question = await questionModel.findByPk(questionId, { include: [resultModel] });
   
-  if (!question) {
-    throw new Error('Question not found');
-  }
+  const transaction = await sequelize.transaction();
 
-  let result = await resultModel.findOne({ where: { answer: normalizedAnswer, questionId } });
+  try {
+    const question = await questionModel.findByPk(questionId, { include: [resultModel] }, { transaction });
+    
+    if (!question) {
+      throw new Error('Question not found');
+    }
 
-  if (result) {
-    await result.increment('total');
-    await updateRatio(questionId);
-    const updatedResult = await resultModel.findOne({ where: { answer: normalizedAnswer, questionId } });
-    return updatedResult;
-  } else {
-    const totalResults = await resultModel.sum('total', { where: { questionId } });
-    const newResult = await resultModel.create({
-      answer: normalizedAnswer,
-      questionId,
-      total: 1,
-      ratio: 1 / (totalResults + 1) 
-    });
-    await updateRatio(questionId);
-    return newResult;
+    let result = await resultModel.findOne({ where: { answer: normalizedAnswer, questionId } }, { transaction });
+
+    if (result) {
+      await result.increment('total', { transaction });
+      await updateRatio(questionId, transaction);
+      result = await resultModel.findOne({ where: { answer: normalizedAnswer, questionId } }, { transaction });
+    } else {
+      const totalResults = await resultModel.sum('total', { where: { questionId } }, { transaction });
+      result = await resultModel.create({
+        answer: normalizedAnswer,
+        questionId,
+        total: 1,
+        ratio: 1 / (totalResults + 1)
+      }, { transaction });
+    }
+
+    await transaction.commit();
+    return result;
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
   }
 };
 
 // Update ratio for all results of a question
-const updateRatio = async (questionId) => {
-  const results = await resultModel.findAll({ where: { questionId } });
-  const totalResults = await resultModel.sum('total', { where: { questionId } });
-
+const updateRatio = async (questionId, transaction) => {
+  const results = await resultModel.findAll({ where: { questionId } }, { transaction });
+  const totalResults = await resultModel.sum('total', { where: { questionId } }, { transaction });
 
   for (const result of results) {
     const newRatio = result.total / totalResults;
-    await result.update({ ratio: newRatio });
+    await result.update({ ratio: newRatio }, { transaction });
   }
 };
 

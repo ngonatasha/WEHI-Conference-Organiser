@@ -87,6 +87,10 @@ io.on('connection', (socket) => {
       socket.emit('error', { message: error.message });
     }
   });
+  
+  socket.on('nextQuestion', (nextIndex) => {
+    io.emit('nextQuestion', nextIndex); // Broadcast 
+  });
 
   socket.on('disconnect', () => {
     console.log('user disconnected');
