@@ -1,0 +1,52 @@
+.poll-page-container {
+    padding: 20px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.poll-page-container h1 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    text-align: center;
+}
+
+.poll-page-container p {
+    margin-bottom: 20px;
+}
+
+.poll-page-container textarea {
+    display: block;
+    width: calc(100% - 40px); 
+    margin-left: 20px; 
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+.poll-page-container button {
+    display: block;
+    margin: 20px auto 0;
+    padding: 10px 20px;
+    background-color:   #571845;
+    ;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.poll-page-container button:hover {
+    background-color: #571845;
+}
+
+.poll-page-container img {
+    display: block;
+    margin: 10px auto;
+    max-width: 100%;
+    max-height: 200px; 
+    border-radius: 5px;
+}

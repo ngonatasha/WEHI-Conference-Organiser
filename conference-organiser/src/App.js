@@ -18,7 +18,7 @@ import ResultsPage from './pages/results/Results';
 
 function App() {
   const { currentTime, userTimeZone } = useTime(); // Timezone handling
-  const { handleHomeButton, handlePollAdminAccess, handlePollAccess, handleAdminAcess } = useButtonHandlers();  // Button handling
+  const { handleHomeButton, handlePollAdminAccess, handlePollAccess, handleAdminAcess, handleResultsAcess } = useButtonHandlers();  // Button handling
 
 
   // HTML Code for the homepage
@@ -30,11 +30,11 @@ function App() {
         <button onClick={handleHomeButton} className="buttons">
           Homepage
         </button>
-        <button onClick={handleAdminAcess} className="buttons">
-          Admin
-        </button>
         <button onClick={handlePollAccess} className="buttons">
           Poll
+        </button>
+        <button onClick={handleResultsAcess} className="buttons">
+          Poll results
         </button>
       </div>
 
