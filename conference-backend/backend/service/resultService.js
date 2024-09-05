@@ -1,52 +1,57 @@
 const resultModel = require('../model/resultModel');
 const questionModel = require('../model/questionModel');
 const sequelize = require('../../backend/db');
+const { Mutex } = require('async-mutex');
+const mutex = new Mutex();
 // Create or update a result based on the answer
 const createOrUpdateResult = async (data) => {
   const { answer, questionId } = data;
   const normalizedAnswer = answer.toLowerCase();
-  
-  const transaction = await sequelize.transaction();
+
+  // Acquire the lock
+  const release = await mutex.acquire();
 
   try {
-    const question = await questionModel.findByPk(questionId, { include: [resultModel] }, { transaction });
+    const question = await questionModel.findByPk(questionId, { include: [resultModel] });
     
     if (!question) {
       throw new Error('Question not found');
     }
 
-    let result = await resultModel.findOne({ where: { answer: normalizedAnswer, questionId } }, { transaction });
+    let result = await resultModel.findOne({ where: { answer: normalizedAnswer, questionId } });
 
     if (result) {
-      await result.increment('total', { transaction });
-      await updateRatio(questionId, transaction);
-      result = await resultModel.findOne({ where: { answer: normalizedAnswer, questionId } }, { transaction });
+      await result.increment('total');
+      await updateRatio(questionId); // Call without transaction now
+      result = await resultModel.findOne({ where: { answer: normalizedAnswer, questionId } });
     } else {
-      const totalResults = await resultModel.sum('total', { where: { questionId } }, { transaction });
+      const totalResults = await resultModel.sum('total', { where: { questionId } });
       result = await resultModel.create({
         answer: normalizedAnswer,
         questionId,
         total: 1,
         ratio: 1 / (totalResults + 1)
-      }, { transaction });
+      });
     }
 
-    await transaction.commit();
+    // Return the result after the lock is released
     return result;
   } catch (error) {
-    await transaction.rollback();
     throw error;
+  } finally {
+    // Always release the lock
+    release();
   }
 };
 
 // Update ratio for all results of a question
-const updateRatio = async (questionId, transaction) => {
-  const results = await resultModel.findAll({ where: { questionId } }, { transaction });
-  const totalResults = await resultModel.sum('total', { where: { questionId } }, { transaction });
+const updateRatio = async (questionId) => {
+  const results = await resultModel.findAll({ where: { questionId } });
+  const totalResults = await resultModel.sum('total', { where: { questionId } });
 
   for (const result of results) {
     const newRatio = result.total / totalResults;
-    await result.update({ ratio: newRatio }, { transaction });
+    await result.update({ ratio: newRatio });
   }
 };
 
