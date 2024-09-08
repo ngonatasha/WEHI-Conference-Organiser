@@ -39,7 +39,6 @@ const createOrUpdateResult = async (data) => {
   } catch (error) {
     throw error;
   } finally {
-    // Always release the lock
     release();
   }
 };
@@ -54,6 +53,7 @@ const updateRatio = async (questionId) => {
     await result.update({ ratio: newRatio });
   }
 };
+
 
 // Get all results by questionId
 const getResultsByQuestionId = async (questionId) => {

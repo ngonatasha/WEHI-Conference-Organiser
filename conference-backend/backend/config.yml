@@ -2,7 +2,7 @@ config:
   target: "http://localhost:2000" 
   phases:
     - duration: 1                 
-      rampTo: 100                
+      rampTo: 500                
   engines:
     socketio: {}                
 scenarios:
