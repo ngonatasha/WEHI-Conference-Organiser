@@ -1,0 +1,17 @@
+config:
+  target: "http://localhost:2000" 
+  phases:
+    - duration: 1                 
+      rampTo: 500                
+  engines:
+    socketio: {}                
+scenarios:
+  - engine: "socketio"
+    flow:
+      - emit:
+          channel: "createResult"  
+          data:
+            questionId: 4          
+            answer: "Answer 1"  
+
+
