@@ -45,6 +45,7 @@ const PollPage = () => {
             
             if (response.data) {
                 setIsAuthenticated(true);
+                setQuestions(response.data);
             } else {
                 alert('Invalid code.');
             }
@@ -79,7 +80,7 @@ const PollPage = () => {
     };
 
     return (
-        <div className="poll-page-container">
+        <div>
             {!isAuthenticated ? (
                 <div>
                     <h1>Enter your unique poll code</h1>
@@ -98,7 +99,7 @@ const PollPage = () => {
                 </div>
             ) : (
                 <div>
-                    <h1>Poll Questions</h1>
+                    <h1>Questions for the poll</h1>
                     <button onClick={handleHomeButton} className="buttons">
                         Homepage
                     </button>
