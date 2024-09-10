@@ -7,8 +7,7 @@ const mutex = new Mutex();
 const createOrUpdateResult = async (data) => {
   const { answer, questionId } = data;
   const normalizedAnswer = answer.toLowerCase();
-
-  // Acquire the lock
+  //lock
   const release = await mutex.acquire();
 
   try {
@@ -17,24 +16,22 @@ const createOrUpdateResult = async (data) => {
     if (!question) {
       throw new Error('Question not found');
     }
-
     let result = await resultModel.findOne({ where: { answer: normalizedAnswer, questionId } });
 
     if (result) {
       await result.increment('total');
-      await updateRatio(questionId); // Call without transaction now
+      await updateRatio(questionId);
       result = await resultModel.findOne({ where: { answer: normalizedAnswer, questionId } });
     } else {
-      const totalResults = await resultModel.sum('total', { where: { questionId } });
+      const totalResults = await resultModel.sum('total', { where: { questionId } }) || 0;
       result = await resultModel.create({
         answer: normalizedAnswer,
         questionId,
         total: 1,
         ratio: 1 / (totalResults + 1)
       });
+      await updateRatio(questionId);
     }
-
-    // Return the result after the lock is released
     return result;
   } catch (error) {
     throw error;
