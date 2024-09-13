@@ -150,6 +150,3 @@ const PollPage = () => {
 };
 
 export default PollPage;
-
-
-

@@ -1,53 +1,68 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useButtonHandlers } from '../../utils/buttonHandling';  // Import the button handlers
+import axiosInstance from '../../utils/axios';
 
-function ResultsPage() {
-    const [password, setPassword] = useState(''); // State for the password input
-    const [isAuthenticated, setIsAuthenticated] = useState(false); // Check if user is authenticated 
-    const { handleHomeButton, handlePollAdminAccess } = useButtonHandlers();  // Use the home button handler
+const ResultPage = () => {
+    const [uniqueCode, setUniqueCode] = useState('');
+    const [questions, setQuestions] = useState([]);
+    const [results, setResults] = useState({});
+    const [error, setError] = useState('');
 
-    // Handling the password
-    const passwordCheck = () => {
-        if (password === 'CODE') {
-            setIsAuthenticated(true);
-        } else {
-            alert('Invalid code.');
+    const fetchResults = async () => {
+        try {
+            const response = await axiosInstance.get(`/results/poll/${uniqueCode}`);
+            if (response.data) {
+                setQuestions(response.data.questions);
+                setResults(response.data.results);
+                setError('');
+            } else {
+                setQuestions([]);
+                setResults({});
+                setError('No data found for this unique code.');
+            }
+        } catch (error) {
+            console.error('Error fetching results:', {
+                message: error.message,
+                response: error.response ? error.response.data : 'No response data',
+                status: error.response ? error.response.status : 'No status code'
+            });
+            setError('Failed to fetch results.');
         }
     };
 
-    // HTML Code for Poll page
+    const handleSubmit = () => {
+        fetchResults();
+    };
+
     return (
         <div>
-            {!isAuthenticated ? (
+            <h1>Enter Poll Unique Code</h1>
+            <input
+                type="text"
+                value={uniqueCode}
+                onChange={(e) => setUniqueCode(e.target.value)}
+                placeholder="Enter unique code"
+            />
+            <button onClick={handleSubmit}>Submit</button>
+            {error && <p>{error}</p>}
+            {questions.length > 0 && (
                 <div>
-                    <h1>Enter unique poll code to access results</h1>
-                    <button onClick={handleHomeButton} className="buttons">
-                        Homepage
-                    </button>
-                    <div>
-                        <input
-                            type="password"
-                            placeholder="Enter password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                        <button onClick={passwordCheck}>Submit</button>
-                    </div>
-                </div>
-            ) : (
-                <div>
-                    {/* Poll section */}
-
-                    <h1>Here you can see the results for xyz poll</h1>
-                    <button onClick={handleHomeButton} className="buttons">
-                        Homepage
-                    </button>
-
+                    <h2>Questions and Results</h2>
+                    {questions.map((question) => (
+                        <div key={question.id}>
+                            <h3>{question.questionDescription}</h3>
+                            {results[question.id] && results[question.id].map((result) => (
+                                <div key={result.answer}>
+                                    <p>Answer: {result.answer}</p>
+                                    <p>Total: {result.total}</p>
+                                    <p>Ratio: {result.ratio}</p>
+                                </div>
+                            ))}
+                        </div>
+                    ))}
                 </div>
             )}
         </div>
     );
-}
+};
 
-export default ResultsPage;
+export default ResultPage;
