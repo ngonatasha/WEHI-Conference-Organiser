@@ -78,6 +78,13 @@ const PollPage = () => {
             alert("You've reached the end of the questions.");
         }
     };
+    const showPreviousQuestion = () => {
+        if (currentQuestionIndex > 0) {
+            socket.emit('nextQuestion', currentQuestionIndex - 1);
+        } else {
+            alert("You're already at the first question.");
+        }
+    };
 
     return (
         <div>
@@ -137,7 +144,12 @@ const PollPage = () => {
                                         </div>
                                     ))}
                                 </div>
+                                {currentQuestionIndex > 0 && localStorage.getItem('p') === 'success'&&( 
+                                    <button onClick={showPreviousQuestion}>Previous Question</button>
+                                )}
+                                {localStorage.getItem('p') === 'success' && (  
                                 <button onClick={showNextQuestion}>Next Question</button>
+                            )}
                             </div>
                         ) : (
                             <p>No questions found.</p>

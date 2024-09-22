@@ -9,11 +9,12 @@ function AdminPage() {
     const [password, setPassword] = useState(''); // State for the password input
     const [isAuthenticated, setIsAuthenticated] = useState(false); // Check if user is authenticated 
     const { handleHomeButton, handlePollAdminAccess, handleResultsAcess} = useButtonHandlers();  // Use the home button handler
-
+    
     // Handling the password
     const passwordCheck = () => {
         if (password === 'WEHI') {
             setIsAuthenticated(true);
+            localStorage.setItem("p","success")
         } else {
             alert('Invalid code.');
         }
