@@ -30,10 +30,6 @@ const resultModel = sequelize.define('resultModel', {
     type: DataTypes.FLOAT,
     allowNull: true
   }
-}, {
-  schema: 'Conference_react',
-  tableName: 'resultModel', 
-  timestamps: false 
 });
 
 resultModel.belongsTo(questionModel, { foreignKey: 'questionId' });

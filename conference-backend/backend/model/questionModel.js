@@ -33,16 +33,12 @@ const questionModel = sequelize.define('questionModel', {
     onDelete: 'CASCADE',
     allowNull: false
   }
-}, {
-  schema: 'Conference_react',
-  tableName: 'questionModel', 
-  timestamps: false 
 });
 questionModel.belongsTo(pollModel, { foreignKey: 'pollId' });
 pollModel.hasMany(questionModel, { foreignKey: 'pollId', onDelete: 'CASCADE' })
 sequelize.sync({ force: false })
   .then(() => {
-    console.log('Database & tables created!');
+    console.log('Database & tables created for questionModels!');
   })
   .catch(err => {
     console.error('Error syncing database:', err);
