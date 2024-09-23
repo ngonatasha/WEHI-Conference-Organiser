@@ -14,7 +14,7 @@ const sequelize = new Sequelize("postgres://udrappds5d8tkk:p04ab1ac60c4bb98c9593
 
 module.exports = sequelize;
 
-// How to query the database
+// How to query the database through psql or pgadmin
 
 // 1. install postgres locally (to have psql shell) or any other form of DB query tool
 // 2. enter below credentials to connect to the database
