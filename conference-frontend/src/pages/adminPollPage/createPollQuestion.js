@@ -8,13 +8,28 @@ function CreatePollQuestion({ onCreate }) {
   const [questionDescription, setQuestionDescription] = useState('');
   const [questionImage, setQuestionImage] = useState(null);
   const [choices, setChoices] = useState([{ text: '', isCorrect: false }]);
+  const [questionsList, setQuestionsList] = useState([]);
+  const [editIndex, setEditIndex] = useState(null);
 
-  // const handleGoBack = () => {
-  //   navigate('/poll');
-  // };
-
-   const handleSubmit = () => {
+  const handleSubmit = () => {
     if (questionDescription && questionType) {
+      const newQuestion = {
+        questionType,
+        questionDescription,
+        choices: questionType === 'multiple' ? choices : [],
+        image: questionImage ? URL.createObjectURL(questionImage) : null
+      };
+
+      const updatedQuestionsList = [...questionsList];
+
+      if (editIndex !== null) {
+        updatedQuestionsList[editIndex] = newQuestion; // Update existing question
+      } else {
+        updatedQuestionsList.push(newQuestion); // Add new question
+      }
+
+      setQuestionsList(updatedQuestionsList);
+
       const formData = new FormData();
       formData.append('questionType', questionType);
       formData.append('questionDescription', questionDescription);
@@ -27,10 +42,23 @@ function CreatePollQuestion({ onCreate }) {
 
       if (onCreate) onCreate(formData);
 
-      navigate('/AdminPollPage');
+      // Clear input fields and reset state after submitting or saving changes
+      setQuestionDescription('');
+      setChoices([{ text: '', isCorrect: false }]);
+      setQuestionImage(null);
+      setEditIndex(null);
     } else {
       alert('Please fill in all required fields.');
     }
+  };
+
+  const handleEdit = (index) => {
+    const questionToEdit = questionsList[index];
+    setQuestionType(questionToEdit.questionType);
+    setQuestionDescription(questionToEdit.questionDescription);
+    setChoices(questionToEdit.choices.length > 0 ? questionToEdit.choices : [{ text: '', isCorrect: false }]);
+    setQuestionImage(null); // Image can't be reloaded 
+    setEditIndex(index);
   };
 
   const handleChoiceChange = (index, event) => {
@@ -57,10 +85,7 @@ function CreatePollQuestion({ onCreate }) {
 
   return (
     <div className="create-poll-container">
-      <h2>Create Poll Question</h2>
-      {/* <button onClick={handleGoBack} className="buttons">
-        Go Back
-      </button> */}
+      <h2>{editIndex !== null ? 'Edit Poll Question' : 'Create Poll Question'}</h2>
       <div>
         <label>
           Question Type:
@@ -100,24 +125,51 @@ function CreatePollQuestion({ onCreate }) {
                     value={choice.text}
                     onChange={(e) => handleChoiceChange(index, e)}
                   />
+                  {}
                   <input
                     type="checkbox"
                     checked={choice.isCorrect}
                     onChange={() => handleCorrectChoiceChange(index)}
-                  /> Correct
+                    style={{ display: 'none' }}  // hiding correct box for now 
+                  />
                 </label>
                 <button type="button" onClick={() => removeChoice(index)}>Remove</button>
               </div>
             ))}
           </div>
         )}
-        
         <button onClick={handleSubmit} className="buttons">
-          Add Question
+          {editIndex !== null ? 'Save Changes' : 'Add Question'}
         </button>
+      </div>
+
+      {/* Displaying added questions below the button */}
+      <div className="questions-list">
+        {questionsList.length > 0 && (
+          <>
+            <h3>Added Questions</h3>
+            {questionsList.map((question, index) => (
+              <div key={index} className="question-display">
+                <p><strong>Type:</strong> {question.questionType}</p>
+                <p><strong>Description:</strong> {question.questionDescription}</p>
+                {question.image && <img src={question.image} alt="Question" style={{ maxWidth: '200px' }} />}
+                {question.choices.length > 0 && (
+                  <ul>
+                    {question.choices.map((choice, idx) => (
+                      <li key={idx}>{choice.text}</li>
+                    ))}
+                  </ul>
+                )}
+                <button onClick={() => handleEdit(index)}>Edit</button>
+              </div>
+            ))}
+          </>
+        )}
       </div>
     </div>
   );
 }
 
 export default CreatePollQuestion;
+
+
