@@ -12,14 +12,10 @@ const pollModel = sequelize.define('pollModel', {
     allowNull: false
   },
   
-}, {
-  schema: 'Conference_react',
-  tableName: 'pollModel', 
-  timestamps: false 
 });
 sequelize.sync({ force: false })
   .then(() => {
-    console.log('Database & tables created!');
+    console.log('Database & tables created for pollModels!');
   })
   .catch(err => {
     console.error('Error syncing database:', err);
