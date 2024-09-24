@@ -1,0 +1,40 @@
+.create-poll-container {
+  padding-left: 20px;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.create-poll-container label {
+  display: block;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.create-poll-container input[type="text"],
+.create-poll-container input[type="file"],
+.create-poll-container select {
+  display: block;
+  margin-left: 20px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.create-poll-container .question-list {
+  margin-top: 30px;
+}
+
+.create-poll-container .question-item {
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+  padding: 10px;
+  background: #fff;
+}
+
+.create-poll-container .question-item p {
+  margin: 0;
+  font-size: 16px;
+}
+

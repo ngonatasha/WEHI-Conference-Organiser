@@ -57,34 +57,6 @@ function AdminPollPage() {
             {/* Poll Question section */}
             <p>This is the Poll Admin page where admin can manage the polls.</p>
             <CreatePollQuestion onCreate={handleCreatePoll} />
-
-            {/* Display the list of poll questions */}
-            <div>
-                <h2>Poll Questions</h2>
-                {pollQuestions.map((question, index) => (
-                    <div key={index}>
-                        <h3>Question {index + 1}</h3>
-                        <p>Type: {question.get("questionType")}</p>
-                        <p>Description: {question.get("questionDescription")}</p>
-                        {question.get('questionImage') && (
-                            <img
-                                src={URL.createObjectURL(question.get('questionImage'))}
-                                alt="Question"
-                                style={{ maxWidth: '200px', maxHeight: '200px' }}
-                            />
-                        )}
-                        {question.get("questionType") === 'multiple' && (
-                            <ul>
-                                {JSON.parse(question.get("choices")).map((choice, i) => (
-                                    <li key={i}>
-                                        {choice.text} {choice.isCorrect ? '(Correct)' : ''}
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
-                ))}
-            </div>
             <div className="submit-poll-container">
                 <button onClick={SubmitPoll} className="buttons">
                     Submit Poll
