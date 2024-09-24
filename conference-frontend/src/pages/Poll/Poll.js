@@ -46,6 +46,7 @@ const PollPage = () => {
             if (response.data) {
                 setIsAuthenticated(true);
                 setQuestions(response.data);
+                console.log(questions)
             } else {
                 alert('Invalid code.');
             }
@@ -111,49 +112,75 @@ const PollPage = () => {
                         Homepage
                     </button>
                     <div>
-                        {questions.length > 0 ? (
-                            <div key={questions[currentQuestionIndex].id}>
-                                <h2>Type: {questions[currentQuestionIndex].questionType}</h2>
-                                <p>Description: {questions[currentQuestionIndex].questionDescription}</p>
-                                {questions[currentQuestionIndex].questionImage && (
-                                    <img 
-                                        src={`data:image/png;base64,${convertBufferToBase64(questions[currentQuestionIndex].questionImage.data)}`} 
-                                        alt="Question"
-                                        style={{ maxWidth: '200px', maxHeight: '200px' }}
-                                    />
-                                )}
-                                {questions[currentQuestionIndex].choices && (
-                                    <p>Choices: {JSON.stringify(questions[currentQuestionIndex].choices)}</p>
-                                )}
+                    {questions.length > 0 ? (
+                        <div key={questions[currentQuestionIndex].id}>
+                            <h2>Type: {questions[currentQuestionIndex].questionType}</h2>
+                            <p>Description: {questions[currentQuestionIndex].questionDescription}</p>
+
+                            {questions[currentQuestionIndex].questionImage && (
+                                <img
+                                    src={`data:image/png;base64,${convertBufferToBase64(questions[currentQuestionIndex].questionImage.data)}`}
+                                    alt="Question"
+                                    style={{ maxWidth: '200px', maxHeight: '200px' }}
+                                />
+                            )}
+
+                            {questions[currentQuestionIndex].questionType === 'multiple' ? (
+                                <div>
+                                    <h3>Choices:</h3>
+                                    <ul>
+                                        {JSON.parse(questions[currentQuestionIndex].choices).map((choice, index) => (
+                                            <li key={index}>
+                                                <label>
+                                                    <input
+                                                        type="radio"
+                                                        name={`question-${questions[currentQuestionIndex].id}`}
+                                                        value={choice.text}
+                                                        onChange={() => (questions[currentQuestionIndex].currentAnswer = choice.text)}
+                                                    />
+                                                    {choice.text}
+                                                </label>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    <button onClick={() => submitAnswer(questions[currentQuestionIndex].id, questions[currentQuestionIndex].currentAnswer)}>
+                                        Submit
+                                    </button>
+                                </div>
+                            ) : (
                                 <div>
                                     <input
                                         type="text"
                                         placeholder="Enter your answer"
-                                        onChange={(e) => (questions[currentQuestionIndex].currentAnswer = e.target.value)} 
+                                        onChange={(e) => (questions[currentQuestionIndex].currentAnswer = e.target.value)}
                                     />
                                     <button onClick={() => submitAnswer(questions[currentQuestionIndex].id, questions[currentQuestionIndex].currentAnswer)}>
                                         Submit
                                     </button>
                                 </div>
-                                <div>
-                                    {results && results.map((result) => (
-                                        <div key={result.answer}>
-                                            <p>Answer: {result.answer}</p>
-                                            <p>Total: {result.total}</p>
-                                            <p>Ratio: {result.ratio}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                                {currentQuestionIndex > 0 && localStorage.getItem('p') === 'success'&&( 
-                                    <button onClick={showPreviousQuestion}>Previous Question</button>
-                                )}
-                                {localStorage.getItem('p') === 'success' && (  
+                            )}
+
+                            <div>
+                                {results && results.map((result) => (
+                                    <div key={result.answer}>
+                                        <p>Answer: {result.answer}</p>
+                                        <p>Total: {result.total}</p>
+                                        <p>Ratio: {result.ratio}</p>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {currentQuestionIndex > 0 && localStorage.getItem('p') === 'success' && (
+                                <button onClick={showPreviousQuestion}>Previous Question</button>
+                            )}
+                            {localStorage.getItem('p') === 'success' && (
                                 <button onClick={showNextQuestion}>Next Question</button>
                             )}
-                            </div>
-                        ) : (
-                            <p>No questions found.</p>
-                        )}
+                        </div>
+                    ) : (
+                        <p>No questions found.</p>
+                    )}
+
                     </div>
                 </div>
             )}
