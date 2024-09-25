@@ -5,13 +5,13 @@ import io from 'socket.io-client';
 import axiosInstance from '../../utils/axios';
 import ReactEcharts from 'echarts-for-react';
 
-
 const PollPage = () => {
     const [password, setPassword] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [questions, setQuestions] = useState([]);
     const [results, setResults] = useState([]);
     const [socket, setSocket] = useState(null);
+    const [start, setStart] = useState(false);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const { handleHomeButton } = useButtonHandlers();
     const navigate = useNavigate();
@@ -35,6 +35,9 @@ const PollPage = () => {
         socketIo.on('nextQuestion', (nextIndex) => {
             setCurrentQuestionIndex(nextIndex);
             setResults([]);
+        });
+        socketIo.on('pollStarted', () => { 
+            setStart(true);
         });
 
         return () => {
@@ -127,6 +130,12 @@ const PollPage = () => {
         text: result.answer,
         ratio: (result.ratio * 100).toFixed(1) // Percentage as string
     }));
+    const handleStartPoll = () => {
+        if (socket) {
+            socket.emit('startPoll'); 
+        }
+    };
+    
 
     return (
         <div>
@@ -148,103 +157,133 @@ const PollPage = () => {
                 </div>
             ) : (
                 <div>
-                    <h1>Questions for the poll</h1>
-                    <button onClick={handleHomeButton} className="buttons">
-                        Homepage
-                    </button>
-                    <div>
-                        {questions.length > 0 ? (
-                            <div key={questions[currentQuestionIndex].id}>
-                                <p>{questions[currentQuestionIndex].questionDescription}</p>
+                    {start? (
+                        <div>
+                            <h1>Questions for the poll</h1>
+                            <button onClick={handleHomeButton} className="buttons">
+                                Homepage
+                            </button>
+                            <div>
+                                {questions.length > 0 ? (
+                                    <div key={questions[currentQuestionIndex].id}>
+                                        <p>{questions[currentQuestionIndex].questionDescription}</p>
 
-                                {questions[currentQuestionIndex].questionImage && (
-                                    <img
-                                        src={`data:image/png;base64,${convertBufferToBase64(questions[currentQuestionIndex].questionImage.data)}`}
-                                        alt="Question"
-                                        style={{ maxWidth: '200px', maxHeight: '200px' }}
-                                    />
-                                )}
+                                        {questions[currentQuestionIndex].questionImage && (
+                                            <img
+                                                src={`data:image/png;base64,${convertBufferToBase64(questions[currentQuestionIndex].questionImage.data)}`}
+                                                alt="Question"
+                                                style={{ maxWidth: '200px', maxHeight: '200px' }}
+                                            />
+                                        )}
 
-                                {questions[currentQuestionIndex].questionType === 'multiple' ? (
-                                    <div>
-                                        <h3>Choices:</h3>
-                                        <ul>
-                                            {JSON.parse(questions[currentQuestionIndex].choices).map((choice, index) => (
-                                                <li key={index}>
-                                                    <label>
-                                                        <input
-                                                            type="radio"
-                                                            name={`question-${questions[currentQuestionIndex].id}`}
-                                                            value={choice.text}
-                                                            onChange={() => (questions[currentQuestionIndex].currentAnswer = choice.text)}
-                                                        />
-                                                        {choice.text}
-                                                    </label>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                        <button onClick={() => submitAnswer(questions[currentQuestionIndex].id, questions[currentQuestionIndex].currentAnswer)}>
-                                            Submit
-                                        </button>
-                                        <div>
-                                            {results && results.length > 0 && (
-                                                <ReactEcharts
-                                                    option={getChartOptions(results)}
-                                                    style={{ width: '100%', height: '400px' }}
-                                                />
-                                            )}
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div>
-                                        <input
-                                            type="text"
-                                            placeholder="Enter your answer"
-                                            onChange={(e) => (questions[currentQuestionIndex].currentAnswer = e.target.value)}
-                                        />
-                                        <button onClick={() => submitAnswer(questions[currentQuestionIndex].id, questions[currentQuestionIndex].currentAnswer)}>
-                                            Submit
-                                        </button>
-                                        <div>
-                                        {results && results.length > 0 && (
+                                        {questions[currentQuestionIndex].questionType === 'multiple' ? (
                                             <div>
-                                                <h3>Answer Ratios:</h3>
-                                                <div style={{
-                                                    display: 'flex',
-                                               
-                                                    gap: '5px', 
-                                                }}>
-                                                    {wordCloudData.map((data, index) => (
-                                                        <div key={index} style={{
-                                                            backgroundColor: '#f0f0f0',
-                                                            border: '1px solid #ccc',
-                                                            borderRadius: '12px',
-                                                            padding: '8px 12px',
-                                                            fontSize: '14px',
-                                                            color: '#333'
-                                                        }}>
-                                                            {data.text} {data.ratio}%
-                                                        </div>
+                                                <h3>Choices:</h3>
+                                                <ul>
+                                                    {JSON.parse(questions[currentQuestionIndex].choices).map((choice, index) => (
+                                                        <li key={index}>
+                                                            <label>
+                                                                <input
+                                                                    type="radio"
+                                                                    name={`question-${questions[currentQuestionIndex].id}`}
+                                                                    value={choice.text}
+                                                                    onChange={() => (questions[currentQuestionIndex].currentAnswer = choice.text)}
+                                                                />
+                                                                {choice.text}
+                                                            </label>
+                                                        </li>
                                                     ))}
+                                                </ul>
+                                                <button onClick={() => submitAnswer(questions[currentQuestionIndex].id, questions[currentQuestionIndex].currentAnswer)}>
+                                                    Submit
+                                                </button>
+                                                <div>
+                                                    {results && results.length > 0 && (
+                                                        <ReactEcharts
+                                                            option={getChartOptions(results)}
+                                                            style={{ width: '100%', height: '400px' }}
+                                                        />
+                                                    )}
                                                 </div>
                                             </div>
+                                        ) : (
+                                            <div>
+                                                <input
+                                                    type="text"
+                                                    placeholder="Enter your answer"
+                                                    onChange={(e) => (questions[currentQuestionIndex].currentAnswer = e.target.value)}
+                                                />
+                                                <button onClick={() => submitAnswer(questions[currentQuestionIndex].id, questions[currentQuestionIndex].currentAnswer)}>
+                                                    Submit
+                                                </button>
+                                                <div>
+                                                    {results && results.length > 0 && (
+                                                        <div>
+                                                            <h3>Answer Ratios:</h3>
+                                                            <div style={{
+                                                                display: 'flex',
+                                                                gap: '5px',
+                                                            }}>
+                                                                {wordCloudData.
+                                                                sort((a, b) => b.ratio - a.ratio).
+                                                                map((data, index) => (
+                                                                    <div key={index} style={{
+                                                                        backgroundColor: '#f0f0f0',
+                                                                        border: '1px solid #ccc',
+                                                                        borderRadius: '12px',
+                                                                        padding: '8px 12px',
+                                                                        fontSize: '14px',
+                                                                        color: '#333'
+                                                                    }}>
+                                                                        {data.text} {data.ratio}%
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                            </div>
+                                        )}
+
+                                        {currentQuestionIndex > 0 && localStorage.getItem('p') === 'success' && (
+                                            <button onClick={showPreviousQuestion}>Previous Question</button>
+                                        )}
+                                        {localStorage.getItem('p') === 'success' && (
+                                            <button onClick={showNextQuestion}>Next Question</button>
                                         )}
                                     </div>
-
-                                    </div>
-                                )}
-
-                                {currentQuestionIndex > 0 && localStorage.getItem('p') === 'success' && (
-                                    <button onClick={showPreviousQuestion}>Previous Question</button>
-                                )}
-                                {localStorage.getItem('p') === 'success' && (
-                                    <button onClick={showNextQuestion}>Next Question</button>
+                                ) : (
+                                    <p>No questions found.</p>
                                 )}
                             </div>
-                        ) : (
-                            <p>No questions found.</p>
-                        )}
+                        </div>
+                    ) : (
+                        <div>
+                        <h1>
+                            Poll will start soon
+                            <span className="dots">...</span> 
+                        </h1>
+                        <button onClick={handleHomeButton} className="buttons">
+                            Homepage
+                        </button>
+                        {localStorage.getItem("p") && <button onClick={handleStartPoll}>start</button>}
+                        <style>
+                            {`
+                            .dots {
+                                display: inline-block;
+                                animation: blink 1s steps(1, end) infinite; 
+                            }
+
+                            @keyframes blink {
+                                0%, 100% { opacity: 0; }
+                                50% { opacity: 1; }
+                            }
+                            `}
+                        </style>
                     </div>
+                    
+                    )}
                 </div>
             )}
         </div>
@@ -252,5 +291,6 @@ const PollPage = () => {
 };
 
 export default PollPage;
+
 
 

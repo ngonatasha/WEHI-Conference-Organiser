@@ -7,6 +7,7 @@ import CreatePollQuestion from './createPollQuestion';
 function AdminPollPage() {
     const [pollQuestions, setPollQuestions] = useState([]); // State to hold poll questions
     const { handleHomeButton } = useButtonHandlers();  // Use the home button handler
+    const [uniqueCode, setUniqueCode] = useState(null);
     const generateUniqueCode = () => {
         return Math.floor(1000 + Math.random() * 9000); 
     };
@@ -14,6 +15,7 @@ function AdminPollPage() {
     const SubmitPoll = async () => {
         try {
             const uniqueCode = generateUniqueCode();
+            setUniqueCode(uniqueCode);
             const pollResponse = await axiosInstance.post('/poll', { uniqueCode });
             
             const pollId = pollResponse.data.id; 
@@ -48,20 +50,32 @@ function AdminPollPage() {
     // HTML Code for Poll Admin page
     return (
         <div>
-            {/* Poll Admin section */}
-            <h1>Poll Admin Access</h1>
-            <button onClick={handleHomeButton} className="buttons">
-                Homepage
-            </button>
+            {!uniqueCode &&(
+                <div>
+                     <h1>Poll Admin Access</h1>
+                    <button onClick={handleHomeButton} className="buttons">
+                        Homepage
+                    </button>
 
-            {/* Poll Question section */}
-            <p>This is the Poll Admin page where admin can manage the polls.</p>
-            <CreatePollQuestion onCreate={handleCreatePoll} />
-            <div className="submit-poll-container">
-                <button onClick={SubmitPoll} className="buttons">
-                    Submit Poll
-                </button>
-            </div>
+                    {/* Poll Question section */}
+                    <p>This is the Poll Admin page where admin can manage the polls.</p>
+                    <CreatePollQuestion onCreate={handleCreatePoll} />
+                    <div className="submit-poll-container">
+                        <button onClick={SubmitPoll} className="buttons">
+                            Submit Poll
+                        </button>
+                    </div>
+
+                </div>
+
+            )}
+            
+           
+            {uniqueCode && (
+                <div>
+                    <h2>Poll Code: {uniqueCode}</h2>
+                </div>
+            )}
         </div>
     );
 }

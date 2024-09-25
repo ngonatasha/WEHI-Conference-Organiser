@@ -91,6 +91,9 @@ io.on('connection', (socket) => {
   socket.on('nextQuestion', (nextIndex) => {
     io.emit('nextQuestion', nextIndex); // Broadcast 
   });
+  socket.on('startPoll', () => {
+    io.emit('pollStarted');
+});
 
   socket.on('disconnect', () => {
     console.log('user disconnected');

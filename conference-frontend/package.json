@@ -18,7 +18,8 @@
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
     "tippy.js": "^6.3.7",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "react-scripts start",

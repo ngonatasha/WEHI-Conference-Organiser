@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axiosInstance from '../../utils/axios';
 import ReactEcharts from 'echarts-for-react';
+import * as XLSX from 'xlsx';
 
 const ResultPage = () => {
     const [uniqueCode, setUniqueCode] = useState('');
@@ -33,6 +34,42 @@ const ResultPage = () => {
     const handleSubmit = () => {
         fetchResults();
     };
+    const exportToExcel = () => {
+        const workbook = XLSX.utils.book_new();
+        const sheetData = [];
+        const uniqueQuestions = new Set(); // abandon repetitive questions
+    
+        questions.forEach(question => {
+            const answers = results[question.id] || [];
+    
+            // Check if the question has already been added
+            if (!uniqueQuestions.has(question.questionDescription)) {
+                uniqueQuestions.add(question.questionDescription); 
+                
+                sheetData.push({
+                    Question: question.questionDescription,
+                    Answer: '',
+                    Total: '',
+                    Ratio: ''
+                });
+            }
+    
+            answers.forEach(result => {
+                sheetData.push({
+                    Question: '', 
+                    Answer: result.answer,
+                    Total: result.total,
+                    Ratio: result.ratio
+                });
+            });
+        });
+    
+        const worksheet = XLSX.utils.json_to_sheet(sheetData);
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Poll Results');
+        
+        XLSX.writeFile(workbook, 'poll_results.xlsx');
+    };
+    
 
     const getPieChartOption = (questionId) => {
         const data = results[questionId].map(result => ({
@@ -128,6 +165,7 @@ const ResultPage = () => {
             {questions.length > 0 && (
                 <div>
                     <h2>Questions and Results</h2>
+                    <button onClick={exportToExcel} style={{ marginBottom: '20px' }}>Export to Excel</button>
                     {questions.map((question) => (
                         <div key={question.id} style={{ marginBottom: '40px' }}>
                             <h3>{question.questionDescription}</h3>
@@ -152,3 +190,4 @@ const ResultPage = () => {
 };
 
 export default ResultPage;
+
