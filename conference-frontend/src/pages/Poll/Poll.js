@@ -114,8 +114,8 @@ const PollPage = () => {
                     <div>
                     {questions.length > 0 ? (
                         <div key={questions[currentQuestionIndex].id}>
-                            <h2>Type: {questions[currentQuestionIndex].questionType}</h2>
-                            <p>Description: {questions[currentQuestionIndex].questionDescription}</p>
+                            {/* <h2>Type: {questions[currentQuestionIndex].questionType}</h2> */}
+                            <p>{questions[currentQuestionIndex].questionDescription}</p>
 
                             {questions[currentQuestionIndex].questionImage && (
                                 <img
