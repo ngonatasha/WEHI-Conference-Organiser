@@ -1,5 +1,6 @@
 const resultModel = require('../model/resultModel');
 const questionModel = require('../model/questionModel');
+const pqlModel = require('../model/pollModel'); 
 const sequelize = require('../../backend/db');
 const { Mutex } = require('async-mutex');
 const mutex = new Mutex();
@@ -79,11 +80,39 @@ const deleteResult = async (id) => {
   }
   return null;
 };
-
+const findPollIdByUniqueCode = async (uniqueCode) => {
+	const poll = await pqlModel.findOne({ where: { uniqueCode } });
+	if (!poll) {
+	  throw new Error('Poll not found');
+	}
+	return poll.id;
+  };
+  const getQuestionsAndResultsByPollId = async (pollId) => {
+    const questions = await questionModel.findAll({
+      where: { pollId }
+    });
+    if (questions.length === 0) {
+      throw new Error('No questions found for the given poll ID');
+    }
+    const results = {};
+    for (const question of questions) {
+      const questionResults = await resultModel.findAll({
+      where: { questionId: question.id },
+      attributes: ['answer', 'total', 'ratio']
+      });
+      results[question.id] = questionResults;
+    }
+    return { questions, results };
+  };
+  const getQuestionsAndResultsByUniqueCode = async (uniqueCode) => {
+    const pollId = await findPollIdByUniqueCode(uniqueCode);
+    return await getQuestionsAndResultsByPollId(pollId);
+    };
 module.exports = {
   findResultsByQuestionId,
   findResultById,
   createOrUpdateResult,
   deleteResult,
-  getResultsByQuestionId
+  getResultsByQuestionId,
+  getQuestionsAndResultsByUniqueCode
 };

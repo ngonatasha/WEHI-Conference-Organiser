@@ -110,10 +110,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const questionRouter = require('./routes/question');
 const pollRouter = require('./routes/poll');
-
+const resultRouter = require('./routes/result');
 app.use('/question', upload.single('questionImage'), questionRouter);
 app.use('/poll', pollRouter);
-
+app.use('/results', resultRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
