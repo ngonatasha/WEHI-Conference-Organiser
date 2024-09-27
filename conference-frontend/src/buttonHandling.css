@@ -1,11 +1,13 @@
 .buttons {
-    color: #571845;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-bottom: 10px;
-  }
+  color: #571845;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #f8f8f8; 
+  border: 1px solid #818181; 
+  margin: 5px;
+}
   
   .buttonContainer {
     text-align: left; 
@@ -13,3 +15,67 @@
     gap: 5px
   }
   
+/* UI For code input */
+
+.poll-code-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px; 
+  color: #571845;
+}
+
+.poll-code-input {
+  padding: 10px;
+  font-size: 16px;
+  width: 250px;
+}
+
+.poll-code-submit {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  color: #571845;
+}
+
+.poll-image {
+  width: 100px; 
+  height: auto;
+}
+
+/*AdminPage buttons*/
+
+.create-poll-button, .see-results-button {
+  width: 50%; 
+}
+
+.admin-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.attribution {
+  font-size: 12px;
+  text-align: center;
+  margin-top: 20px;
+  color: #666;
+}
+
+.icons {
+  width: 50px;
+}
+
+/*ResultsPage buttons*/
+
+.results-buttons {
+  padding: 5px 10px;  
+  border-radius: 5px;
+  font-size: 12px; 
+  cursor: pointer;
+  background-color: #7a2462;
+  color: white;
+  border: 1px solid #818181;
+  margin: 5px;
+}
