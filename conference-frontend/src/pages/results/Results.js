@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import axiosInstance from '../../utils/axios';
 import ReactEcharts from 'echarts-for-react';
 import * as XLSX from 'xlsx';
+import '../../buttonHandling.css'
+import { useButtonHandlers } from '../../utils/buttonHandling';
+
+import logo from '../../assets/RSE_AUNZ_logo.png';
+
 
 const ResultPage = () => {
     const [uniqueCode, setUniqueCode] = useState('');
@@ -9,6 +14,10 @@ const ResultPage = () => {
     const [results, setResults] = useState({});
     const [error, setError] = useState('');
     const [chartType, setChartType] = useState({});
+    const [isSubmitted, setIsSubmitted] = useState(false);
+    const { handleHomeButton } = useButtonHandlers();
+
+
 
     const fetchResults = async () => {
         try {
@@ -17,6 +26,7 @@ const ResultPage = () => {
                 setQuestions(response.data.questions);
                 setResults(response.data.results);
                 setError('');
+                setIsSubmitted(true); // notify successful submission
             } else {
                 setQuestions([]);
                 setResults({});
@@ -164,44 +174,60 @@ const ResultPage = () => {
     return (
         <div>
             <h1>Enter Poll Unique Code</h1>
-            <input
-                type="text"
-                value={uniqueCode}
-                onChange={(e) => setUniqueCode(e.target.value)}
-                placeholder="Enter unique code"
-            />
-            <button onClick={handleSubmit}>Submit</button>
+
+            <button onClick={handleHomeButton} className="buttons">
+                Homepage
+            </button>
+
+            {!isSubmitted && ( // Only show when code not submitted
+                <div className="poll-code-container">
+                    <img src={logo} alt="Poll Logo" className="poll-image" />
+                    <input
+                        type="text"
+                        placeholder="Enter your unique poll code"
+                        value={uniqueCode}
+                        onChange={(e) => setUniqueCode(e.target.value)}
+                        className="poll-code-input"
+                    />
+                    <button onClick={handleSubmit} className="poll-code-submit">
+                        Submit
+                    </button>
+                </div>
+            )}
+            
             {error && <p>{error}</p>}
             {questions.length > 0 && (
                 <div>
                     <h2>Questions and Results for Poll: {uniqueCode}</h2>
 
-                    <button onClick={exportToExcel} style={{ marginBottom: '20px' }}>Export to Excel</button>
+                    <button onClick={exportToExcel} className = "results-buttons">Export to Excel</button>
+
+
                     {questions.map((question) => (
                         <div key={question.id} style={{ marginBottom: '40px' }}>
                             <h3>{question.questionDescription}</h3>
 
                             {/* Button for chart switch */}
-                            <button onClick={() => toggleChartType(question.id)}>
+                            <button onClick={() => toggleChartType(question.id)} className = 'results-buttons'>
                                 {chartType[question.id] === 'bar' ? 'Show Pie Chart' : 'Show Bar Chart'}
                             </button>
 
 
                             {results[question.id] && (
                                 <div>
-                                {/* Render the correct type of chart */}
-                                {chartType[question.id] === 'bar' ? (
-                                    <ReactEcharts
-                                        option={getBarChartOption(question.id)}
-                                        style={{ height: '300px', width: '100%', marginTop: '20px' }}
-                                    />
-                                ) : (
-                                    <ReactEcharts
-                                        option={getPieChartOption(question.id)}
-                                        style={{ height: '300px', width: '100%' }}
-                                    />
-                                )}
-                            </div>
+                                    {/* Render the correct type of chart */}
+                                    {chartType[question.id] === 'bar' ? (
+                                        <ReactEcharts
+                                            option={getBarChartOption(question.id)}
+                                            style={{ height: '300px', width: '100%', marginTop: '20px' }}
+                                        />
+                                    ) : (
+                                        <ReactEcharts
+                                            option={getPieChartOption(question.id)}
+                                            style={{ height: '300px', width: '100%' }}
+                                        />
+                                    )}
+                                </div>
                             )}
                         </div>
                     ))}

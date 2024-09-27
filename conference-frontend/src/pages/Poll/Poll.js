@@ -4,6 +4,9 @@ import { useButtonHandlers } from '../../utils/buttonHandling';
 import io from 'socket.io-client';
 import axiosInstance from '../../utils/axios';
 import ReactEcharts from 'echarts-for-react';
+import '../../buttonHandling.css';
+import logo from '../../assets/RSE_AUNZ_logo.png';
+
 
 const PollPage = () => {
     const [password, setPassword] = useState('');
@@ -36,7 +39,7 @@ const PollPage = () => {
             setCurrentQuestionIndex(nextIndex);
             setResults([]);
         });
-        socketIo.on('pollStarted', () => { 
+        socketIo.on('pollStarted', () => {
             setStart(true);
         });
 
@@ -132,10 +135,10 @@ const PollPage = () => {
     }));
     const handleStartPoll = () => {
         if (socket) {
-            socket.emit('startPoll'); 
+            socket.emit('startPoll');
         }
     };
-    
+
 
     return (
         <div>
@@ -145,19 +148,31 @@ const PollPage = () => {
                     <button onClick={handleHomeButton} className="buttons">
                         Homepage
                     </button>
-                    <div>
+
+                    
+                    <div className="poll-code-container">
+                        <img src={logo} alt="Poll Logo" className="poll-image" />
+
                         <input
-                            type="password"
-                            placeholder="Enter password"
+                            type="text"
+                            placeholder="Enter your unique poll code"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
+                            className="poll-code-input"
                         />
-                        <button onClick={passwordCheck}>Submit</button>
+                        <button
+                            onClick={passwordCheck}
+                            className="poll-code-submit"
+                        >
+                            Submit
+                        </button>
                     </div>
+
+                    
                 </div>
             ) : (
                 <div>
-                    {start? (
+                    {start ? (
                         <div>
                             <h1>Questions for the poll</h1>
                             <button onClick={handleHomeButton} className="buttons">
@@ -225,19 +240,19 @@ const PollPage = () => {
                                                                 gap: '5px',
                                                             }}>
                                                                 {wordCloudData.
-                                                                sort((a, b) => b.ratio - a.ratio).
-                                                                map((data, index) => (
-                                                                    <div key={index} style={{
-                                                                        backgroundColor: '#f0f0f0',
-                                                                        border: '1px solid #ccc',
-                                                                        borderRadius: '12px',
-                                                                        padding: '8px 12px',
-                                                                        fontSize: '14px',
-                                                                        color: '#333'
-                                                                    }}>
-                                                                        {data.text} {data.ratio}%
-                                                                    </div>
-                                                                ))}
+                                                                    sort((a, b) => b.ratio - a.ratio).
+                                                                    map((data, index) => (
+                                                                        <div key={index} style={{
+                                                                            backgroundColor: '#f0f0f0',
+                                                                            border: '1px solid #ccc',
+                                                                            borderRadius: '12px',
+                                                                            padding: '8px 12px',
+                                                                            fontSize: '14px',
+                                                                            color: '#333'
+                                                                        }}>
+                                                                            {data.text} {data.ratio}%
+                                                                        </div>
+                                                                    ))}
                                                             </div>
                                                         </div>
                                                     )}
@@ -260,16 +275,16 @@ const PollPage = () => {
                         </div>
                     ) : (
                         <div>
-                        <h1>
-                            Poll will start soon
-                            <span className="dots">...</span> 
-                        </h1>
-                        <button onClick={handleHomeButton} className="buttons">
-                            Homepage
-                        </button>
-                        {localStorage.getItem("p") && <button onClick={handleStartPoll}>start</button>}
-                        <style>
-                            {`
+                            <h1>
+                                Poll will start soon
+                                <span className="dots">...</span>
+                            </h1>
+                            <button onClick={handleHomeButton} className="buttons">
+                                Homepage
+                            </button>
+                            {localStorage.getItem("p") && <button onClick={handleStartPoll}>start</button>}
+                            <style>
+                                {`
                             .dots {
                                 display: inline-block;
                                 animation: blink 1s steps(1, end) infinite; 
@@ -280,9 +295,9 @@ const PollPage = () => {
                                 50% { opacity: 1; }
                             }
                             `}
-                        </style>
-                    </div>
-                    
+                            </style>
+                        </div>
+
                     )}
                 </div>
             )}
