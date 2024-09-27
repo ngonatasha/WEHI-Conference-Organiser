@@ -200,7 +200,7 @@ const ResultPage = () => {
                 <div>
                     <h2>Questions and Results for Poll: {uniqueCode}</h2>
 
-                    <button onClick={exportToExcel} className = "results-buttons">Export to Excel</button>
+                    <button onClick={exportToExcel} className = "mini-buttons">Export to Excel</button>
 
 
                     {questions.map((question) => (
@@ -208,7 +208,7 @@ const ResultPage = () => {
                             <h3>{question.questionDescription}</h3>
 
                             {/* Button for chart switch */}
-                            <button onClick={() => toggleChartType(question.id)} className = 'results-buttons'>
+                            <button onClick={() => toggleChartType(question.id)} className = 'mini-buttons'>
                                 {chartType[question.id] === 'bar' ? 'Show Pie Chart' : 'Show Bar Chart'}
                             </button>
 
