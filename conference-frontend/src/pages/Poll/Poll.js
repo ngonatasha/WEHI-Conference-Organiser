@@ -209,8 +209,8 @@ const PollPage = () => {
                                                         </li>
                                                     ))}
                                                 </ul>
-                                                <button onClick={() => submitAnswer(questions[currentQuestionIndex].id, questions[currentQuestionIndex].currentAnswer)}>
-                                                    Submit
+                                                <button onClick={() => submitAnswer(questions[currentQuestionIndex].id, questions[currentQuestionIndex].currentAnswer)} className='mini-buttons'>
+                                                    Submit 
                                                 </button>
                                                 <div>
                                                     {results && results.length > 0 && (
@@ -228,7 +228,7 @@ const PollPage = () => {
                                                     placeholder="Enter your answer"
                                                     onChange={(e) => (questions[currentQuestionIndex].currentAnswer = e.target.value)}
                                                 />
-                                                <button onClick={() => submitAnswer(questions[currentQuestionIndex].id, questions[currentQuestionIndex].currentAnswer)}>
+                                                <button onClick={() => submitAnswer(questions[currentQuestionIndex].id, questions[currentQuestionIndex].currentAnswer)} className='mini-buttons'>
                                                     Submit
                                                 </button>
                                                 <div>
@@ -262,10 +262,10 @@ const PollPage = () => {
                                         )}
 
                                         {currentQuestionIndex > 0 && localStorage.getItem('p') === 'success' && (
-                                            <button onClick={showPreviousQuestion}>Previous Question</button>
+                                            <button onClick={showPreviousQuestion} className='mini-buttons'>Previous Question</button>
                                         )}
                                         {localStorage.getItem('p') === 'success' && (
-                                            <button onClick={showNextQuestion}>Next Question</button>
+                                            <button onClick={showNextQuestion} className='mini-buttons'>Next Question</button>
                                         )}
                                     </div>
                                 ) : (
@@ -282,7 +282,7 @@ const PollPage = () => {
                             <button onClick={handleHomeButton} className="buttons">
                                 Homepage
                             </button>
-                            {localStorage.getItem("p") && <button onClick={handleStartPoll}>start</button>}
+                            {localStorage.getItem("p") && <button onClick={handleStartPoll} className='mini-buttons'>Start poll</button>}
                             <style>
                                 {`
                             .dots {
