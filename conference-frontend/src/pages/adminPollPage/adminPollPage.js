@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../utils/axios';
 import { useButtonHandlers } from '../../utils/buttonHandling';
@@ -6,8 +6,9 @@ import CreatePollQuestion from './createPollQuestion';
 
 function AdminPollPage() {
     const [pollQuestions, setPollQuestions] = useState([]); // State to hold poll questions
-    const { handleHomeButton } = useButtonHandlers();  // Use the home button handler
+    const { handleHomeButton } = useButtonHandlers();  
     const [uniqueCode, setUniqueCode] = useState(null);
+
     const generateUniqueCode = () => {
         return Math.floor(1000 + Math.random() * 9000); 
     };
@@ -24,6 +25,9 @@ function AdminPollPage() {
                 questionFormData.append('pollId', pollId);
                 return questionFormData;
             });
+
+            // Deal with duplicates
+            console.log('Submitting the following form data:', formDataArray);
 
             const responses = await Promise.all(
                 formDataArray.map(formData =>
@@ -43,16 +47,27 @@ function AdminPollPage() {
             alert('There was an error submitting the poll. Please try again.');
         }
     };
-    // Function to handle adding a new poll question
+
+    // Function to handle new or edited questions 
     const handleCreatePoll = (newPollQuestion) => {
-        setPollQuestions([...pollQuestions, newPollQuestion]);
+        const existingQuestionIndex = pollQuestions.findIndex(
+            (q) => q.get('id') === newPollQuestion.get('id')
+        );
+
+        if (existingQuestionIndex !== -1) {
+            const updatedQuestions = [...pollQuestions];
+            updatedQuestions[existingQuestionIndex] = newPollQuestion;
+            setPollQuestions(updatedQuestions);
+        } else {
+            setPollQuestions([...pollQuestions, newPollQuestion]);
+        }
     };
-    // HTML Code for Poll Admin page
+
     return (
         <div>
-            {!uniqueCode &&(
+            {!uniqueCode && (
                 <div>
-                     <h1>Poll Admin Access</h1>
+                    <h1>Poll Admin Access</h1>
                     <button onClick={handleHomeButton} className="buttons">
                         Homepage
                     </button>
@@ -65,12 +80,9 @@ function AdminPollPage() {
                             Submit Poll
                         </button>
                     </div>
-
                 </div>
-
-            )}
+            )} 
             
-           
             {uniqueCode && (
                 <div>
                     <h2>Poll Code: {uniqueCode}</h2>
