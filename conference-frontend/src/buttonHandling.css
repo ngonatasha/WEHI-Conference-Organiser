@@ -79,3 +79,6 @@
   border: 1px solid #818181;
   margin: 5px;
 }
+.mini-buttons:active {
+  transform: scale(0.95);
+}
