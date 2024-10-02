@@ -20,7 +20,7 @@ const PollPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const socketIo = io('http://localhost:2000');
+        const socketIo = io('/api');
         setSocket(socketIo);
 
         socketIo.on('resultCreated', (results) => {
