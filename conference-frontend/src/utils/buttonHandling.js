@@ -28,6 +28,10 @@ export function useButtonHandlers() {
   const handlePollAccess = () => {
     navigate('/PollPage');
   };
+  const handlePollManagementAcess = () => {
+    navigate('/PollManagementPage');
+  };
+  
 
   return {
     handleHomeButton,
@@ -35,6 +39,7 @@ export function useButtonHandlers() {
     handlePollAccess,
     handleCreatePollClick,
     handleAdminAcess,
-    handleResultsAcess
+    handleResultsAcess,
+    handlePollManagementAcess
   };
 }

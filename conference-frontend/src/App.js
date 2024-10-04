@@ -14,6 +14,7 @@ import AdminPollPage from './pages/adminPollPage/adminPollPage'; // Not sure why
 import AdminPage from './pages/AdminPage';
 import PollPage from './pages/Poll/Poll';
 import ResultsPage from './pages/results/Results';
+import PollManagementPage from './pages/Poll/PollManagement';
 
 
 function App() {
@@ -69,6 +70,7 @@ function AppWrapper() {
         <Route path="/create-poll" element={<CreatePollQuestion />} />
         <Route path="/adminPage" element={<AdminPage />} />
         <Route path="/resultsPage" element={<ResultsPage />} />
+        <Route path="/PollManagementPage" element={<PollManagementPage />} />
       </Routes>
     </Router>
   );

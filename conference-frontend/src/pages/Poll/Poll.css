@@ -5,6 +5,7 @@
     border-radius: 5px;
     max-width: 600px;
     margin: 0 auto;
+   
 }
 
 .poll-page-container h1 {
@@ -51,5 +52,101 @@
     border-radius: 5px;
 }
 
+/* message css */
 
+.message-container {
+    border: 1px solid #ccc;
+    padding: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    
+}
 
+.message-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.avatar {
+    margin-right: 10px;
+}
+
+.avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.message-bubble {
+    background-color: #e0e0e0;
+    padding: 8px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    border-radius: 8px;
+    max-width: 100%; 
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    
+    word-wrap: break-word; 
+}
+
+.message-form {
+    display: flex;
+    gap: 10px;
+}
+
+.message-form input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.message-form button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.message-form button:hover {
+    background-color: #0056b3;
+}
+
+.dots {
+    display: inline-block;
+    animation: blink 1s steps(1, end) infinite; 
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+}
+.answerBlock{
+    background-color: #f0f0f0;
+    border: solid #ccc;
+    border-radius: 12px;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #333;
+    word-wrap: break-word; 
+    max-width: 45%; 
+    text-align: left;
+}
+.answer-ratios-container {
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: center; 
+    gap: 10px; 
+    margin-top: 20px; 
+}
+.forcecenter{
+    text-align: center;
+}

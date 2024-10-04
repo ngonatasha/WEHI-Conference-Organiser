@@ -10,6 +10,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 const { Server } = require('socket.io');
 const http = require('http');
 const resultService = require('./service/resultService'); 
+const messageService = require('./service/messageService'); 
 
 const app = express();
 const server = http.createServer(app);
@@ -21,9 +22,19 @@ const io = new Server(server, {
     credentials: true
   }
 });
-
+var connected=0;
+let currentQuestionIndex = -1; 
+let pollStarted = false;
 io.on('connection', (socket) => {
   console.log('a user connected');
+  connected++;
+  
+  if (pollStarted) {
+    socket.emit('pollStarted'); 
+    socket.emit('nextQuestion', currentQuestionIndex); 
+  } else {
+    socket.emit('pollNotStarted', 'Poll will start soon...'); 
+  }
 
   socket.on('createResult', async (data) => {
     try {
@@ -35,7 +46,7 @@ io.on('connection', (socket) => {
       socket.emit('error', { message: error.message });
     }
   });
-
+  
   socket.on('getResultsByQuestionId', async (questionId) => {
     try {
       const results = await resultService.getResultsByQuestionId(questionId);
@@ -89,10 +100,32 @@ io.on('connection', (socket) => {
   });
   
   socket.on('nextQuestion', (nextIndex) => {
+    currentQuestionIndex = nextIndex; 
     io.emit('nextQuestion', nextIndex); // Broadcast 
   });
+  socket.on('chatMessage', async (data) => {
+    try {
+      const { content, pollId } = data;
+      const newMessage = await messageService.createMessage(content, pollId);
+      io.emit('chatMessage', newMessage);
+    } catch (error) {
+      socket.emit('error', { message: error.message });
+    }
+  });
+  socket.on('getMessagesByPollId', async (pollId) => {
+    try {
+      const messages = await messageService.getMessagesByPollId(pollId);
+      socket.emit('messagesByPollId', messages); 
+    } catch (error) {
+      socket.emit('error', { message: error.message });
+    }
+  });
+
   socket.on('startPoll', () => {
+    pollStarted = true;
+    currentQuestionIndex = 0;
     io.emit('pollStarted');
+    io.emit('nextQuestion', currentQuestionIndex);
 });
 
   socket.on('disconnect', () => {

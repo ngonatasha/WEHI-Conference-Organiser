@@ -60,10 +60,10 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete a poll by ID (and its associated questions)
-router.delete('/:id', async (req, res) => {
+router.delete('/:uniqueCode', async (req, res) => {
   try {
-    const id = req.params.id;
-    const deleted = await pollService.deletePoll(id);
+    const uniqueCode= req.params.uniqueCode;
+    const deleted = await pollService.deletePoll(uniqueCode);
     if (deleted) {
       res.status(204).send(); // No content
     } else {

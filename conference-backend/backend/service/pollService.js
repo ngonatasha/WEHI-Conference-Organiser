@@ -75,10 +75,10 @@ const updatePoll = async (id, updates) => {
 };
 
 // Delete a poll by ID 
-const deletePoll = async (id) => {
+const deletePoll = async (uniqueCode) => {
   try {
     const deleted = await pollModel.destroy({
-      where: { id }
+      where: {uniqueCode }
     });
     if (deleted) {
       return true;
