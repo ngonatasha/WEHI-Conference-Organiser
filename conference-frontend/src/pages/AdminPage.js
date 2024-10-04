@@ -12,7 +12,6 @@ function AdminPage() {
     const [password, setPassword] = useState(''); // State for the password input
     const [isAuthenticated, setIsAuthenticated] = useState(false); // Check if user is authenticated 
     const { handleHomeButton, handlePollAdminAccess, handleResultsAcess,handlePollManagementAcess } = useButtonHandlers();  // Use the home button handler
-    const [showResults, setShowResults] = useState(false);
     // Handling the password
     const passwordCheck = () => {
         if (password === 'WEHI') {
@@ -69,10 +68,10 @@ function AdminPage() {
                             Create poll
                         </button>
                         <img src={resultsLogo} alt="Results Logo" className="icons" />
-                        <button onClick={handleResultsAcess} className="buttons see-results-button">
+                        {/* <button onClick={handleResultsAcess} className="buttons see-results-button">
                             Poll results
-                        </button>
-                        <button onClick={() => {setShowResults(!showResults);handlePollManagementAcess();}} className="buttons see-results-button">
+                        </button> */}
+                        <button onClick={() => {handlePollManagementAcess();}} className="buttons see-results-button">
                             Poll Management
                         </button>
                     </div>
@@ -80,7 +79,7 @@ function AdminPage() {
                     <p class="attribution">
                         Icons by <a href="https://www.freepik.com/author/pandu-bramantyo/icons" target="_blank" rel="noopener noreferrer">Pandu Bramantyo</a>
                     </p>
-                    {showResults && <PollManagement />} 
+
                 </div>
 
             )}

@@ -12,8 +12,8 @@ export function useButtonHandlers() {
     navigate('/AdminPollPage');
   };
 
-    const handleResultsAcess = () => {
-    navigate('/ResultsPage');
+  const handleResultsAcess = (uniqueCode) => {
+    navigate('/ResultsPage', { state: { uniqueCode } });
   };
 
     const handleAdminAcess = () => {

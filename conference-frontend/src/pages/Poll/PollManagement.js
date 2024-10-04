@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../../utils/axios';
-
+import { useButtonHandlers } from '../../utils/buttonHandling';
 function PollManagement() {
   const [polls, setPolls] = useState([]);
+  const {  handleResultsAcess,handlePollManagementAcess,handleHomeButton } = useButtonHandlers();
 
-  // Fetch all polls from the server when the component mounts
   useEffect(() => {
     axiosInstance.get('/poll')
       .then((response) => {
@@ -15,18 +15,27 @@ function PollManagement() {
       });
   }, []);
 
-  // Function to delete a poll by ID
   const deletePoll = async(uniqueCode) => {
-    await axiosInstance.delete(`/poll/${uniqueCode}`)
- 
-      .catch((error) => {
+    const confirmDelete = window.confirm(`Are you sure you want to delete this poll? ${uniqueCode}`);
+    
+    if (confirmDelete) {
+      try {
+        await axiosInstance.delete(`/poll/${uniqueCode}`);
+        const response = await axiosInstance.get('/poll');
+        setPolls(response.data);
+      } catch (error) {
         console.error('There was an error deleting the poll!', error);
-      });
+      }
+    }
   };
+  
 
   return (
     <div>
       <h2>Poll Management</h2>
+      <button onClick={handleHomeButton} className="buttons">
+            Homepage
+      </button>
       <table>
         <thead>
           <tr>
@@ -40,6 +49,7 @@ function PollManagement() {
               <td>{poll.uniqueCode}</td>
               <td>
                 <button onClick={() => deletePoll(poll.uniqueCode)}>Delete</button>
+                <button onClick={() => handleResultsAcess(poll.uniqueCode)}>Results</button>
               </td>
             </tr>
           ))}

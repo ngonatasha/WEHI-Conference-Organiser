@@ -1,32 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
 import axiosInstance from '../../utils/axios';
 import ReactEcharts from 'echarts-for-react';
 import * as XLSX from 'xlsx';
 import '../../buttonHandling.css'
 import { useButtonHandlers } from '../../utils/buttonHandling';
-
+import { useLocation } from 'react-router-dom';
 import logo from '../../assets/RSE_AUNZ_logo.png';
 
 
 const ResultPage = () => {
-    const [uniqueCode, setUniqueCode] = useState('');
     const [questions, setQuestions] = useState([]);
     const [results, setResults] = useState({});
     const [error, setError] = useState('');
     const [chartType, setChartType] = useState({});
-    const [isSubmitted, setIsSubmitted] = useState(false);
-    const { handleHomeButton } = useButtonHandlers();
-
-
+    const { handleHomeButton,handlePollManagementAcess } = useButtonHandlers();
+    const location = useLocation();
+    const uniqueCodes = location.state?.uniqueCode;
+    useEffect(() => {
+        if (uniqueCodes) {
+          fetchResults();
+        }
+      }, [uniqueCodes]);
 
     const fetchResults = async () => {
         try {
-            const response = await axiosInstance.get(`/results/poll/${uniqueCode}`);
+            const response = await axiosInstance.get(`/results/poll/${uniqueCodes}`);
             if (response.data) {
                 setQuestions(response.data.questions);
                 setResults(response.data.results);
                 setError('');
-                setIsSubmitted(true); // notify successful submission
             } else {
                 setQuestions([]);
                 setResults({});
@@ -42,9 +44,6 @@ const ResultPage = () => {
         }
     };
 
-    const handleSubmit = () => {
-        fetchResults();
-    };
     const exportToExcel = () => {
         const workbook = XLSX.utils.book_new();
         const sheetData = [];
@@ -173,32 +172,17 @@ const ResultPage = () => {
 
     return (
         <div>
-            <h1>Enter Poll Unique Code</h1>
+           
 
             <button onClick={handleHomeButton} className="buttons">
                 Homepage
             </button>
-
-            {!isSubmitted && ( // Only show when code not submitted
-                <div className="poll-code-container">
-                    <img src={logo} alt="Poll Logo" className="poll-image" />
-                    <input
-                        type="text"
-                        placeholder="Enter your unique poll code"
-                        value={uniqueCode}
-                        onChange={(e) => setUniqueCode(e.target.value)}
-                        className="poll-code-input"
-                    />
-                    <button onClick={handleSubmit} className="poll-code-submit">
-                        Submit
-                    </button>
-                </div>
-            )}
-            
-            {error && <p>{error}</p>}
+            <button onClick={handlePollManagementAcess} className="buttons">
+                Poll Management
+            </button>
             {questions.length > 0 && (
                 <div>
-                    <h2>Questions and Results for Poll: {uniqueCode}</h2>
+                    <h2>Questions and Results for Poll: {uniqueCodes}</h2>
 
                     <button onClick={exportToExcel} className = "mini-buttons">Export to Excel</button>
 
