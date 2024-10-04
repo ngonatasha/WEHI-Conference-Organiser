@@ -22,12 +22,13 @@ const io = new Server(server, {
     credentials: true
   }
 });
-var connected=0;
+let connected=0;
 let currentQuestionIndex = -1; 
 let pollStarted = false;
 io.on('connection', (socket) => {
   console.log('a user connected');
   connected++;
+  io.emit('connectedUsers', connected);
   
   if (pollStarted) {
     socket.emit('pollStarted'); 
@@ -126,10 +127,12 @@ io.on('connection', (socket) => {
     currentQuestionIndex = 0;
     io.emit('pollStarted');
     io.emit('nextQuestion', currentQuestionIndex);
-});
+  });
 
   socket.on('disconnect', () => {
     console.log('user disconnected');
+    connected--;
+    io.emit('connectedUsers', connected);
   });
 });
 
