@@ -22,46 +22,74 @@ const io = new Server(server, {
     credentials: true
   }
 });
-let connected=0;
-let currentQuestionIndex = -1; 
-let pollStarted = false;
+
+let polls = {};
+
 io.on('connection', (socket) => {
   console.log('a user connected');
-  connected++;
-  io.emit('connectedUsers', connected);
-  
-  if (pollStarted) {
-    socket.emit('pollStarted'); 
-    socket.emit('nextQuestion', currentQuestionIndex); 
-  } else {
-    socket.emit('pollNotStarted', 'Poll will start soon...'); 
-  }
+
+  socket.on('joinPoll', (pollId) => {
+    socket.join(pollId);
+    
+    if (!polls[pollId]) {
+      polls[pollId] = {
+        connectedUsers: 0,
+        pollStarted: false,
+        currentQuestionIndex: -1,
+      };
+    }
+
+    polls[pollId].connectedUsers++;
+    io.to(pollId).emit('connectedUsers', polls[pollId].connectedUsers);
+
+    if (polls[pollId].pollStarted) {
+      socket.emit('pollStarted');
+      socket.emit('nextQuestion', polls[pollId].currentQuestionIndex);
+    } else {
+      socket.emit('pollNotStarted', 'Poll will start soon...');
+    }
+  });
+
+  socket.on('startPoll', (pollId) => {
+    if (polls[pollId]) {
+      polls[pollId].pollStarted = true;
+      polls[pollId].currentQuestionIndex = 0;
+      io.to(pollId).emit('pollStarted');
+      io.to(pollId).emit('nextQuestion', polls[pollId].currentQuestionIndex);
+    }
+  });
+
+  socket.on('nextQuestion', (pollId, nextIndex) => {
+    if (polls[pollId]) {
+      polls[pollId].currentQuestionIndex = nextIndex;
+      io.to(pollId).emit('nextQuestion', nextIndex); 
+    }
+  });
 
   socket.on('createResult', async (data) => {
     try {
-      const { answer, questionId } = data;
+      const { answer, questionId, pollId } = data;
       const newResult = await resultService.createOrUpdateResult({ answer, questionId });
-      io.emit('resultCreated', await resultService.getResultsByQuestionId(questionId));
-   
-    } catch (error) {
-      socket.emit('error', { message: error.message });
-    }
-  });
-  
-  socket.on('getResultsByQuestionId', async (questionId) => {
-    try {
-      const results = await resultService.getResultsByQuestionId(questionId);
-      io.emit('resultsByQuestionId', results);
+      io.to(pollId).emit('resultCreated', await resultService.getResultsByQuestionId(questionId));
     } catch (error) {
       socket.emit('error', { message: error.message });
     }
   });
 
-  socket.on('getResultById', async (id) => {
+  socket.on('getResultsByQuestionId', async (questionId, pollId) => {
+    try {
+      const results = await resultService.getResultsByQuestionId(questionId);
+      io.to(pollId).emit('resultsByQuestionId', results);
+    } catch (error) {
+      socket.emit('error', { message: error.message });
+    }
+  });
+
+  socket.on('getResultById', async (id, pollId) => {
     try {
       const result = await resultService.findResultById(id);
       if (result) {
-        socket.emit('resultById', result);
+        io.to(pollId).emit('resultById', result);
       } else {
         socket.emit('error', { message: 'Result not found' });
       }
@@ -72,12 +100,12 @@ io.on('connection', (socket) => {
 
   socket.on('updateResult', async (data) => {
     try {
-      const { id, updates } = data;
+      const { id, updates, pollId } = data;
       const updatedResult = await resultService.updateResult(id, updates);
       if (updatedResult) {
-        const questionId = updatedResult.questionId; 
-        io.emit('resultUpdated', await resultService.getResultsByQuestionId(questionId));
-        socket.emit('resultUpdated', updatedResult); 
+        const questionId = updatedResult.questionId;
+        io.to(pollId).emit('resultUpdated', await resultService.getResultsByQuestionId(questionId));
+        io.to(pollId).emit('resultUpdated', updatedResult);
       } else {
         socket.emit('error', { message: 'Result not found' });
       }
@@ -86,12 +114,11 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('deleteResult', async (id) => {
+  socket.on('deleteResult', async (id, pollId) => {
     try {
       const deletedResult = await resultService.deleteResult(id);
       if (deletedResult) {
-        io.emit('resultDeleted', await resultService.getResultsByQuestionId(deletedResult.questionId));
-      
+        io.to(pollId).emit('resultDeleted', await resultService.getResultsByQuestionId(deletedResult.questionId));
       } else {
         socket.emit('error', { message: 'Result not found' });
       }
@@ -99,40 +126,36 @@ io.on('connection', (socket) => {
       socket.emit('error', { message: error.message });
     }
   });
-  
-  socket.on('nextQuestion', (nextIndex) => {
-    currentQuestionIndex = nextIndex; 
-    io.emit('nextQuestion', nextIndex); // Broadcast 
-  });
+
   socket.on('chatMessage', async (data) => {
     try {
       const { content, pollId } = data;
       const newMessage = await messageService.createMessage(content, pollId);
-      io.emit('chatMessage', newMessage);
-    } catch (error) {
-      socket.emit('error', { message: error.message });
-    }
-  });
-  socket.on('getMessagesByPollId', async (pollId) => {
-    try {
-      const messages = await messageService.getMessagesByPollId(pollId);
-      socket.emit('messagesByPollId', messages); 
+      io.to(pollId).emit('chatMessage', newMessage);
     } catch (error) {
       socket.emit('error', { message: error.message });
     }
   });
 
-  socket.on('startPoll', () => {
-    pollStarted = true;
-    currentQuestionIndex = 0;
-    io.emit('pollStarted');
-    io.emit('nextQuestion', currentQuestionIndex);
+  socket.on('getMessagesByPollId', async (pollId) => {
+    try {
+      const messages = await messageService.getMessagesByPollId(pollId);
+      io.to(pollId).emit('messagesByPollId', messages);
+    } catch (error) {
+      socket.emit('error', { message: error.message });
+    }
   });
 
   socket.on('disconnect', () => {
     console.log('user disconnected');
-    connected--;
-    io.emit('connectedUsers', connected);
+    
+    const rooms = Object.keys(socket.rooms);
+    rooms.forEach(room => {
+      if (polls[room]) {
+        polls[room].connectedUsers--;
+        io.to(room).emit('connectedUsers', polls[room].connectedUsers);
+      }
+    });
   });
 });
 
@@ -153,6 +176,7 @@ const resultRouter = require('./routes/result');
 app.use('/question', upload.single('questionImage'), questionRouter);
 app.use('/poll', pollRouter);
 app.use('/results', resultRouter);
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
@@ -168,5 +192,4 @@ app.use(function(err, req, res, next) {
 });
 
 module.exports = { app, server, io };
-
 

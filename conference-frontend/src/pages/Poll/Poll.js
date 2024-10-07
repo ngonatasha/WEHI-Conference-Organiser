@@ -22,20 +22,23 @@ const PollPage = () => {
     const [messages, setMessages] = useState([]); 
     const [connectedUsers, setConnectedUsers] = useState(0);
 
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
-        const socketIo = io('http://localhost:2000');
+        const socketIo = io('http://localhost:2000');  
         setSocket(socketIo);
 
         socketIo.on('connectedUsers', (connectedUserCount) => {
             setConnectedUsers(connectedUserCount);
         });
-         
-        socketIo.on('chatMessage', (newMessage) => {
-            setMessages(prevMessages => [...prevMessages, newMessage]);
+
+        socketIo.on('pollStarted', () => {
+            setStart(true);
         });
 
-        socketIo.on('resultCreated', (results) => {
-            setResults(results);
+        socketIo.on('nextQuestion', (nextIndex) => {
+            setCurrentQuestionIndex(nextIndex);
+            setResults([]); 
         });
 
         socketIo.on('resultUpdated', (results) => {
@@ -46,15 +49,17 @@ const PollPage = () => {
             setResults(results);
         });
 
-        socketIo.on('nextQuestion', (nextIndex) => {
-            setCurrentQuestionIndex(nextIndex);
-            setResults([]);
+        socketIo.on('resultCreated', (updatedResults) => {
+            setResults(updatedResults); 
         });
-        socketIo.on('pollStarted', () => {
-            setStart(true);
-        });
+
         socketIo.on('messagesByPollId', (messages) => {
             setMessages(messages);
+        });
+
+
+        socketIo.on('chatMessage', (newMessage) => {
+            setMessages((prevMessages) => [...prevMessages, newMessage]); 
         });
 
         return () => {
@@ -67,14 +72,22 @@ const PollPage = () => {
             socket.emit('getMessagesByPollId', questions[0]?.pollId);
         }
     }, [socket, questions]);
+    
+    const joinPollRoom = (pollId) => {
+        if (socket) {
+            socket.emit('joinPoll', pollId); 
+        }
+    };
 
     const passwordCheck = async () => {
+        setLoading(true); 
         try {
             const response = await axiosInstance.get(`/question/uni/${password}`);
 
             if (response.data) {
                 setIsAuthenticated(true);
                 setQuestions(response.data);
+                joinPollRoom(response.data[0].pollId); 
             } else {
                 alert('Invalid code.');
             }
@@ -82,18 +95,23 @@ const PollPage = () => {
             console.error('Error checking code:', error);
             alert('Invalid code.');
         }
+        setLoading(false); 
     };
 
     const submitAnswer = (questionId, answer) => {
         if (socket) {
-            socket.emit('createResult', { answer, questionId });
+            const pollId = questions[0]?.pollId;
+            socket.emit('createResult', { answer, questionId, pollId });  
         }
     };
+
     const sendMessage = async (content) => {
         if (socket) {
-            socket.emit('chatMessage', { content, pollId: questions[0].pollId });
+            const pollId = questions[0]?.pollId;
+            socket.emit('chatMessage', { content, pollId }); 
         }
     };
+
     const handleSendMessage = (e) => {
         e.preventDefault();
         const messageInput = e.target.elements.message;
@@ -111,7 +129,8 @@ const PollPage = () => {
 
     const showNextQuestion = () => {
         if (currentQuestionIndex < questions.length - 1) {
-            socket.emit('nextQuestion', currentQuestionIndex + 1);
+            const pollId = questions[0]?.pollId;
+            socket.emit('nextQuestion', pollId, currentQuestionIndex + 1);  
         } else {
             alert("You've reached the end of the questions.");
         }
@@ -119,12 +138,16 @@ const PollPage = () => {
 
     const showPreviousQuestion = () => {
         if (currentQuestionIndex > 0) {
-            socket.emit('nextQuestion', currentQuestionIndex - 1);
+            const pollId = questions[0]?.pollId;
+            socket.emit('nextQuestion', pollId, currentQuestionIndex - 1);  
         } else {
             alert("You're already at the first question.");
         }
     };
-
+    const wordCloudData = results.map(result => ({
+        text: result.answer,
+        ratio: (result.ratio * 100).toFixed(1) 
+    }));
     const getChartOptions = (results) => {
         const chartData = results.map(result => ({
             value: result.total,
@@ -161,13 +184,10 @@ const PollPage = () => {
         };
     };
 
-    const wordCloudData = results.map(result => ({
-        text: result.answer,
-        ratio: (result.ratio * 100).toFixed(1) // Percentage as string
-    }));
     const handleStartPoll = () => {
         if (socket) {
-            socket.emit('startPoll');
+            const pollId = questions[0]?.pollId;
+            socket.emit('startPoll', pollId);  
         }
     };
 
@@ -192,11 +212,12 @@ const PollPage = () => {
                             onChange={(e) => setPassword(e.target.value)}
                             className="poll-code-input"
                         />
-                        <button
+                         <button
                             onClick={passwordCheck}
                             className="poll-code-submit"
+                            disabled={loading} 
                         >
-                            Submit
+                            {loading ? 'Submitting...' : 'Submit'}
                         </button>
                     </div>
 
@@ -326,7 +347,7 @@ const PollPage = () => {
 
                     </div>
                     ) : (
-                        <div>
+                        <div  className="poll-code-container">
                             <h1>
                                 Poll will start soon
                                 <span className="dots">...</span>
