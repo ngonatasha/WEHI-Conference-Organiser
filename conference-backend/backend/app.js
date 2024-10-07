@@ -24,13 +24,13 @@ const io = new Server(server, {
 });
 
 let polls = {};
-
+const userPollMap = {};
 io.on('connection', (socket) => {
   console.log('a user connected');
 
   socket.on('joinPoll', (pollId) => {
     socket.join(pollId);
-    
+    userPollMap[socket.id] = pollId; 
     if (!polls[pollId]) {
       polls[pollId] = {
         connectedUsers: 0,
@@ -40,6 +40,7 @@ io.on('connection', (socket) => {
     }
 
     polls[pollId].connectedUsers++;
+    console.log(polls)
     io.to(pollId).emit('connectedUsers', polls[pollId].connectedUsers);
 
     if (polls[pollId].pollStarted) {
@@ -56,6 +57,15 @@ io.on('connection', (socket) => {
       polls[pollId].currentQuestionIndex = 0;
       io.to(pollId).emit('pollStarted');
       io.to(pollId).emit('nextQuestion', polls[pollId].currentQuestionIndex);
+    }
+  });
+
+  socket.on('endPoll', (pollId) => {
+    if (polls[pollId]) {
+
+      
+      io.to(pollId).emit('pollEnded');
+      delete polls[pollId];
     }
   });
 
@@ -149,13 +159,13 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('user disconnected');
     
-    const rooms = Object.keys(socket.rooms);
-    rooms.forEach(room => {
-      if (polls[room]) {
-        polls[room].connectedUsers--;
-        io.to(room).emit('connectedUsers', polls[room].connectedUsers);
-      }
-    });
+    const pollId = userPollMap[socket.id];
+    
+    if (pollId && polls[pollId]) {
+      polls[pollId].connectedUsers--;
+      io.to(pollId).emit('connectedUsers', polls[pollId].connectedUsers);
+    }
+    delete userPollMap[socket.id];
   });
 });
 

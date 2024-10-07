@@ -36,6 +36,11 @@ const PollPage = () => {
             setStart(true);
         });
 
+        socketIo.on('pollEnded', () => {
+            setStart(false);
+            setIsAuthenticated(false);
+        });
+
         socketIo.on('nextQuestion', (nextIndex) => {
             setCurrentQuestionIndex(nextIndex);
             setResults([]); 
@@ -61,8 +66,10 @@ const PollPage = () => {
         socketIo.on('chatMessage', (newMessage) => {
             setMessages((prevMessages) => [...prevMessages, newMessage]); 
         });
+        
 
         return () => {
+    
             socketIo.disconnect();
         };
     }, []);
@@ -190,7 +197,12 @@ const PollPage = () => {
             socket.emit('startPoll', pollId);  
         }
     };
-
+    const EndPoll = () => {
+        if (socket) {
+            const pollId = questions[0]?.pollId;
+            socket.emit('endPoll', pollId);  
+        }
+    };
 
     return (
         <div>
@@ -312,6 +324,9 @@ const PollPage = () => {
                                         )}
                                         {localStorage.getItem('p') === 'success' && (
                                             <button onClick={showNextQuestion} className='mini-buttons'>Next Question</button>
+                                        )}
+                                        {localStorage.getItem('p') === 'success' && (
+                                            <button onClick={EndPoll} className='mini-buttons'>End Poll</button>
                                         )}
                                         </div>
                                         
