@@ -13,7 +13,14 @@ const sequelize = new Sequelize("postgres://udrappds5d8tkk:p04ab1ac60c4bb98c9593
 });
 
 module.exports = sequelize;
+// const { Sequelize } = require('sequelize');
 
+// const sequelize = new Sequelize('postgres', 'zheyuanw', '872188810Kk', {
+//   host: '115.146.86.214',
+//   dialect: 'postgres', 
+// });
+
+// module.exports = sequelize;
 // How to query the database through psql or pgadmin
 
 // 1. install postgres locally (to have psql shell) or any other form of DB query tool

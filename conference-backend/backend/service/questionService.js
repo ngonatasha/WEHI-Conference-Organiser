@@ -19,9 +19,9 @@ const createQuestion = async (data) => {
 
 
 // Find a question by ID
-async function findQuestionById(id) {
+async function findQuestionById(pollId) {
   try {
-    const question = await questionModel.findByPk(id);
+    const question = await questionModel.findByPk(pollId);
     return question;
   } catch (error) {
     throw new Error('Error finding question: ' + error.message);
@@ -37,13 +37,13 @@ const findAllQuestions = async () => {
   };
 
 // Update a question by ID
-async function updateQuestion(id, updates) {
+async function updateQuestion(pollId, updates) {
   try {
     const [updated] = await questionModel.update(updates, {
-      where: { id }
+      where: { pollId }
     });
     if (updated) {
-      return await findQuestionById(id);
+      return await findQuestionById(pollId);
     }
     throw new Error('Question not found');
   } catch (error) {

@@ -50,6 +50,7 @@ function PollManagement() {
               <td>
                 <button onClick={() => deletePoll(poll.uniqueCode)}>Delete</button>
                 <button onClick={() => handleResultsAcess(poll.uniqueCode)}>Results</button>
+                <button >Edit questions</button>
               </td>
             </tr>
           ))}
